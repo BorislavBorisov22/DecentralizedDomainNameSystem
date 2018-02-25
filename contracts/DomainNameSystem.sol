@@ -25,6 +25,10 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
 
     mapping(bytes => address) domainNameToOwner;
     mapping(bytes => DomainInfo) domainNameToDomainInfo;
+
+    event DomainRegistered(bytes domainName, bytes4 domainIp, address domainOwner, uint domainExpires);
+    event DomainTransferred(bytes domainName, address oldOwner, address newOwner);
+    event DomainEdited(bytes domainName, bytes4 oldIp, bytes4 newIp);
     
     modifier ValidDomainLength(bytes domain) {
         require(domain[minDomainName - 1] != bytes1(0x0));
@@ -57,15 +61,24 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
             timestamp: now,
             expires: expireTime
         }));
+
+        DomainRegistered(domain, ip, owner, expireTime);
     }
     
     function edit(bytes domain, bytes4 newIp) public DomainOwnerOnly(domain) {
+        bytes4 oldIp = domainNameToDomainInfo[domain].ip;
         domainNameToDomainInfo[domain].ip = newIp;
+
+        DomainEdited(domain, oldIp, newIp);
     }
     
     function transferDomain(bytes domain, address newOwner) public DomainOwnerOnly(domain) {
         require(newOwner != address(0x0));
+
+        address oldOwner = domainNameToOwner[domain];
         domainNameToOwner[domain] = newOwner;
+
+        DomainTransferred(domain, oldOwner, newOwner);
     }
     
     function getIP(bytes domain) public view returns (bytes4) {
