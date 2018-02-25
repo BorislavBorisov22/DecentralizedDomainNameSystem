@@ -5,5 +5,79 @@ import "./libraries/SafeMath.sol";
 import "./abstracts/DomainNameSystemBase.sol";
 
 contract DomainNameSystem is Killable, DomainNameSystemBase {
+    using SafeMath for uint256;
+    //  struct Receipt{
+    //     uint amountPaidWei;
+    //     uint timestamp;
+    //     uint expires;
+    // }
 
+    struct DomainInfo {
+        bytes4 ip;
+        uint expireTime;
+    }
+
+    uint constant minDomainName = 5;
+    uint constant domainPrice = 1 ether;
+    uint constant domainValidPeriod = 1 years;
+
+    mapping(address => Receipt[]) public receiptsByAddress;
+
+    mapping(bytes => address) public domainNameToOwner;
+    mapping(bytes => DomainInfo) public domainNameToDomainInfo;
+    
+    modifier ValidDomainLength(bytes domain) {
+        require(domain[minDomainName - 1] != bytes1(0x0));
+        _;
+    }
+
+    modifier DomainOwnerOnly(bytes domain) {
+        require(domainNameToOwner[domain] == msg.sender);
+        _;
+    }
+
+    function register(bytes domain, bytes4 ip) public payable ValidDomainLength(domain) {
+        // check if the calling address is the domain owner or if the domain has expired and can be bought by another address
+        require(domainNameToOwner[domain] == msg.sender || domainNameToDomainInfo[domain].expireTime < now);
+        require(msg.value >= domainPrice);
+
+        uint expireTime =
+            domainNameToDomainInfo[domain].expireTime < now ?
+            now.add(domainValidPeriod) :
+            domainNameToDomainInfo[domain].expireTime.add(domainValidPeriod);
+        
+        domainNameToDomainInfo[domain].expireTime = expireTime;
+        domainNameToDomainInfo[domain].ip = ip;
+
+        domainNameToOwner[domain] = msg.sender;
+
+        receiptsByAddress[msg.sender].push(
+            Receipt({
+            amountPaidWei: msg.value,
+            timestamp: now,
+            expires: expireTime
+        }));
+    }
+    
+    function edit(bytes domain, bytes4 newIp) public DomainOwnerOnly(domain) {
+        domainNameToDomainInfo[domain].ip = newIp;
+    }
+    
+    function transferDomain(bytes domain, address newOwner) public DomainOwnerOnly(domain) {
+        require(newOwner != address(0x0));
+        domainNameToOwner[domain] = newOwner;
+    }
+    
+    function getIP(bytes domain) public view returns (bytes4) {
+        return domainNameToDomainInfo[domain].ip;
+    }
+    
+    function getPrice(bytes domain) public view returns (uint) {
+        domain = domain;
+        return 1 ether;
+    }
+    
+    function getReceipts(address account) public view returns (Receipt[]) {
+        return receiptsByAddress[account];
+    }
 }
