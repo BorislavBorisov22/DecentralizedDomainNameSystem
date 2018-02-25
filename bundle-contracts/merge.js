@@ -14,4 +14,4 @@ config.files.forEach(file => {
     bundleStream.write(content);
 });
 
-console.log('Contracts bundled successfilly! :)');
+console.log('Contracts bundled successfully! :)');
