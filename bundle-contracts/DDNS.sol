@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.17;
 
 contract Owned {
     address owner;
@@ -106,10 +106,14 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     uint constant domainPrice = 1 ether;
     uint constant domainValidPeriod = 1 years;
 
-    mapping(address => Receipt[]) public receiptsByAddress;
+    mapping(address => Receipt[]) receiptsByAddress;
 
-    mapping(bytes => address) public domainNameToOwner;
-    mapping(bytes => DomainInfo) public domainNameToDomainInfo;
+    mapping(bytes => address) domainNameToOwner;
+    mapping(bytes => DomainInfo) domainNameToDomainInfo;
+
+    event DomainRegistered(bytes domainName, bytes4 domainIp, address domainOwner, uint domainExpires);
+    event DomainTransferred(bytes domainName, address oldOwner, address newOwner);
+    event DomainEdited(bytes domainName, bytes4 oldIp, bytes4 newIp);
     
     modifier ValidDomainLength(bytes domain) {
         require(domain[minDomainName - 1] != bytes1(0x0));
@@ -127,7 +131,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         require(msg.value >= domainPrice);
 
         uint expireTime =
-            domainNameToDomainInfo[domain].expireTime < now ?
+            domainNameToDomainInfo[domain].expireTime < now || domainNameToOwner[domain] != msg.sender ?
             now.add(domainValidPeriod) :
             domainNameToDomainInfo[domain].expireTime.add(domainValidPeriod);
         
@@ -142,15 +146,24 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
             timestamp: now,
             expires: expireTime
         }));
+
+        DomainRegistered(domain, ip, owner, expireTime);
     }
     
     function edit(bytes domain, bytes4 newIp) public DomainOwnerOnly(domain) {
+        bytes4 oldIp = domainNameToDomainInfo[domain].ip;
         domainNameToDomainInfo[domain].ip = newIp;
+
+        DomainEdited(domain, oldIp, newIp);
     }
     
     function transferDomain(bytes domain, address newOwner) public DomainOwnerOnly(domain) {
         require(newOwner != address(0x0));
+
+        address oldOwner = domainNameToOwner[domain];
         domainNameToOwner[domain] = newOwner;
+
+        DomainTransferred(domain, oldOwner, newOwner);
     }
     
     function getIP(bytes domain) public view returns (bytes4) {
@@ -164,5 +177,11 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     
     function getReceipts(address account) public view returns (Receipt[]) {
         return receiptsByAddress[account];
+    }
+
+    function getDomainInfo(bytes domain) public view returns(uint expires, bytes4 ip, address domainOwner) {
+        expires = domainNameToDomainInfo[domain].expireTime;
+        ip = domainNameToDomainInfo[domain].ip;
+        domainOwner = domainNameToOwner[domain];
     }
 }

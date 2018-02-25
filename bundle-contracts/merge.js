@@ -3,7 +3,7 @@ const path = require('path');
 const config = require('./config.json');
 
 const bundleStream = fs.createWriteStream(path.join(__dirname, config.outputPath));
-bundleStream.write('pragma solidity ^0.4.19;');
+bundleStream.write('pragma solidity ^0.4.17;');
 config.files.forEach(file => {
     const content = fs
         .readFileSync(path.join(__dirname, file))

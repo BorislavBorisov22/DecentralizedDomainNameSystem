@@ -37,6 +37,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
 
     modifier DomainOwnerOnly(bytes domain) {
         require(domainNameToOwner[domain] == msg.sender);
+        require(domainNameToDomainInfo[domain].expireTime > now);
         _;
     }
 
