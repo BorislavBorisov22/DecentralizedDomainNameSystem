@@ -1,0 +1,11 @@
+{
+    "name": "DecentralizedDomainNameSystem",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/BorislavBorisov22/DecentralizedDomainNameSystem.git",
+    "author": "BorislavBorisov22 <borislavborisov22@abv.bg>",
+    "license": "MIT",
+    "scripts": {
+        "bundle": "node ./bundle-contracts/merge.js"
+    }
+}
