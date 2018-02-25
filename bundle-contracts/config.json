@@ -1,0 +1,10 @@
+{
+    "files": [
+        "../contracts/common/Owned.sol",
+        "../contracts/common/Killable.sol",
+        "../contracts/libraries/SafeMath.sol",
+        "../contracts/abstracts/DomainNameSystemBase.sol",
+        "../contracts/DomainNameSystem.sol"
+    ],
+    "outputPath": "./DDNS.sol"
+}
