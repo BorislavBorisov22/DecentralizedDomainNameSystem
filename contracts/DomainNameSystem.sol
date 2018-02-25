@@ -6,20 +6,17 @@ import "./abstracts/DomainNameSystemBase.sol";
 
 contract DomainNameSystem is Killable, DomainNameSystemBase {
     using SafeMath for uint256;
-    //  struct Receipt{
-    //     uint amountPaidWei;
-    //     uint timestamp;
-    //     uint expires;
-    // }
 
     struct DomainInfo {
         bytes4 ip;
         uint expireTime;
+        uint boughtFor;
     }
 
     uint constant minDomainName = 5;
-    uint constant domainPrice = 1 ether;
     uint constant domainValidPeriod = 1 years;
+
+    uint domainPrice = 1 ether;
 
     mapping(address => Receipt[]) receiptsByAddress;
 
@@ -46,13 +43,13 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         require(domainNameToOwner[domain] == msg.sender || domainNameToDomainInfo[domain].expireTime < now);
         require(msg.value >= domainPrice);
 
-        uint expireTime =
-            domainNameToDomainInfo[domain].expireTime < now || domainNameToOwner[domain] != msg.sender ?
+        uint expireTime = domainNameToDomainInfo[domain].expireTime < now || domainNameToOwner[domain] != msg.sender ?
             now.add(domainValidPeriod) :
             domainNameToDomainInfo[domain].expireTime.add(domainValidPeriod);
         
         domainNameToDomainInfo[domain].expireTime = expireTime;
         domainNameToDomainInfo[domain].ip = ip;
+        domainNameToDomainInfo[domain].boughtFor = domainPrice;
 
         domainNameToOwner[domain] = msg.sender;
 
@@ -63,6 +60,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
             expires: expireTime
         }));
 
+        domainPrice = calculateNewDomainPrice(domain);
         DomainRegistered(domain, ip, owner, expireTime);
     }
     
@@ -87,8 +85,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     }
     
     function getPrice(bytes domain) public view returns (uint) {
-        domain = domain;
-        return 1 ether;
+       return domainNameToDomainInfo[domain].boughtFor;
     }
     
     function getReceipts(address account) public view returns (Receipt[]) {
@@ -99,5 +96,16 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         expires = domainNameToDomainInfo[domain].expireTime;
         ip = domainNameToDomainInfo[domain].ip;
         domainOwner = domainNameToOwner[domain];
+    }
+
+    function isDomainCurrentlyAvailable(bytes domain) public view returns(bool) {
+        return domainNameToDomainInfo[domain].expireTime < now;
+    }
+
+    function calculateNewDomainPrice(bytes newlyRegisteredDomain) internal pure returns (uint) {
+        // some logic to adjust price based on the lastly registered domain;
+        // for now just sending 1 ether always
+        newlyRegisteredDomain = newlyRegisteredDomain;
+        return 1 ether;
     }
 }
