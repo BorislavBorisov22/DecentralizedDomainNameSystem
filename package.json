@@ -6,7 +6,11 @@
     "author": "BorislavBorisov22 <borislavborisov22@abv.bg>",
     "license": "MIT",
     "scripts": {
-        "bundle": "node ./bundle-contracts/merge.js"
+        "bundle": "node ./bundle-contracts/merge.js",
+        "start": "npm-run-all --parallel open:src lint:watch",
+        "open:src": "babel-node tools/srcServer.js",
+        "lint": "node_modules/.bin/esw webpack.config.* src tools",
+        "lint:watch": "npm run lint -- --watch"
     },
     "dependencies": {
         "babel-polyfill": "6.8.0",
