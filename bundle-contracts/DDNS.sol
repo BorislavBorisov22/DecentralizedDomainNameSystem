@@ -21,8 +21,6 @@ contract Owned {
     }
 }
 
-
-
 contract Killable is Owned {
 
     function kill() public OwnerOnly {
@@ -72,15 +70,15 @@ contract DomainNameSystemBase {
     
     //the domain is bytes, because string is UTF-8 encoded and we cannot get its length
     //the IP is bytes4 because it is more efficient in storing the sequence
-    function register(bytes domain, bytes4 ip) public payable;
+    function register(bytes32 domain, bytes4 ip) public payable;
     
-    function edit(bytes domain, bytes4 newIp) public;
+    function edit(bytes32 domain, bytes4 newIp) public;
+
+    function transferDomain(bytes32 domain, address newOwner) public;
     
-    function transferDomain(bytes domain, address newOwner) public;
+    function getIP(bytes32 domain) public view returns (bytes4);
     
-    function getIP(bytes domain) public view returns (bytes4);
-    
-    function getPrice(bytes domain) public view returns (uint);
+    function getPrice(bytes32 domain) public view returns (uint);
     
     function getReceipts(address account) public view returns (Receipt[]);
 }
@@ -96,53 +94,55 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         bytes4 ip;
         uint expires;
     }
-   
-    // for domains with length more than one hour and
-    uint[] lengthPriceIncreases = [
-        100000000000000000,
-        50000000000000000,
-        40000000000000000,
-        30000000000000000,
+
+    uint[] priceChanges = [
+        5000000000000000,
+        10000000000000000,
         20000000000000000,
-        10000000000000000
+        50000000000000000,
+        100000000000000000
     ];
-   
-    mapping(bytes => DomainInfo) domainNameToDomainInfo;
-    mapping(bytes => address) domainNameToOwner;
-   
-    mapping(address => Receipt[]) addressToReceipts;
-   
-    // constants
+
+    uint DECREASE_PRICE_START_INDEX = 15;
+    uint INCREASE_PRICE_START_INDEX = 10;
+
+    bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
+
+    uint public constant MIN_DOMAIN_PRICE = 1 ether;
     uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
+    uint public constant MIN_DOMAIN_NAME_LENGTH = 5;
+
     uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
-    uint public DOMAIN_START_PRICE = 1 ether;
+
+    mapping(bytes32 => DomainInfo) domainNameToDomainInfo;
+    mapping(bytes32 => address) domainNameToOwner;
+
+    mapping(address => Receipt[]) addressToReceipts;
+
+    event LogDomainRegistered(address owner, bytes32 domain, bytes4 ip, uint expiresIn);
+    event LogDomainExtended(address owner, bytes32 domain, bytes4 ip, uint expiresIn);
+    event LogIpEdited(address owner, bytes32 domain, bytes4 oldIp, bytes4 newIp);
+    event LogDomainTransferred(bytes32 domain, address oldOwner, address newOwner);
    
-    uint MIN_DOMAIN_NAME_LENGTH = 5;
-   
-    event LogDomainRegistered(address owner, bytes domain, bytes4 ip, uint expiresIn);
-    event LogDomainExtended(address owner, bytes domain, bytes4 ip, uint expiresIn);
-    event LogIpEdited(address owner, bytes domain, bytes4 oldIp, bytes4 newIp);
-    event LogDomainTransferred(bytes domain, address oldOwner, address newOwner);
-   
-    modifier canRegisterDomain(bytes domainName) {
+    modifier canRegisterDomain(bytes32 domainName) {
         require(isDomainOwner(msg.sender, domainName) || domainAvailableForRegistration(domainName));
         _;
     }
    
-    modifier validDomainName(bytes domainName) {
-        require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != bytes1(0x0));
+    modifier validDomainName(bytes32 domainName) {
+        require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != BYTES_DEFAULT_VALUE);
         _;
     }
  
-    function isDomainOwner(address adr, bytes domainName) public view returns(bool) {
+    function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
    
-    function domainAvailableForRegistration(bytes domainName) public view returns(bool) {
+    function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
  
-    function register(bytes domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
+    function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         require(msg.value >= DOMAIN_REGISTRATION_PRICE);
        
         domainNameToDomainInfo[domain].ip = ip;
@@ -169,7 +169,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         addressToReceipts[msg.sender].push(newReceipt);
     }
    
-    function edit(bytes domain, bytes4 newIp) public {
+    function edit(bytes32 domain, bytes4 newIp) public {
         require(isDomainOwner(msg.sender, domain));
        
         bytes4 oldIp = domainNameToDomainInfo[domain].ip;
@@ -178,7 +178,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
    
-    function transferDomain(bytes domain, address newOwner) public {
+    function transferDomain(bytes32 domain, address newOwner) public {
         require(isDomainOwner(msg.sender, domain));
        
         address oldOwner = domainNameToOwner[domain];
@@ -187,26 +187,59 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogDomainTransferred(domain, oldOwner, newOwner);
     }
    
-    function getIP(bytes domain) public view returns (bytes4) {
+    function getIP(bytes32 domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
    
-    function getPrice(bytes domain) public view returns (uint) {
-        domain = domain;
-        return DOMAIN_REGISTRATION_PRICE;
+    function getPrice(bytes32 domain) public view returns (uint) {
+        return getNewDomainPrice(domain);
     }
    
     function getReceipts(address account) public view returns (Receipt[]) {
         return addressToReceipts[account];
     }
    
-    function getDomainInfo(bytes domain) public view returns (address owner, uint expires, bytes4 ip) {
+    function getDomainInfo(bytes32 domain) public view returns (address owner, uint expires, bytes4 ip) {
         owner = domainNameToOwner[domain];
         expires = domainNameToDomainInfo[domain].expires;
         ip = domainNameToDomainInfo[domain].ip;
     }
    
-    function getNewPrice(bytes domainName) public pure returns(uint) {
-       
+    function getNewDomainPrice(bytes32 domainName) validDomainName(domainName) internal view returns(uint) {
+        uint increasePriceAmount = 0;
+        uint decreasePriceAmount = 0;
+
+        uint pricesIndex = 0;
+        uint domainNameIndex = DECREASE_PRICE_START_INDEX;
+        // 5 is priceChanges length => hardcoded for less gas expenses
+        while (
+            domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
+            pricesIndex < 5 &&
+            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= 0) {
+
+            decreasePriceAmount = priceChanges[uint(pricesIndex)];
+            pricesIndex++;
+            domainNameIndex++;
+        }
+        
+        // if there were any changes made in decreasing price
+        // there is no point in calculating increaing of the price
+        if (decreasePriceAmount > 0) {
+            return DOMAIN_REGISTRATION_PRICE - decreasePriceAmount;
+        }
+
+        // also trying to save gas
+        pricesIndex = 0;
+        domainNameIndex = INCREASE_PRICE_START_INDEX;
+        while (
+            (domainNameIndex >= domainName.length || domainName[domainNameIndex] == BYTES_DEFAULT_VALUE)
+            && pricesIndex >= 0) {
+
+            increasePriceAmount = priceChanges[uint(pricesIndex)];
+            pricesIndex--;
+            domainNameIndex--;
+        }
+
+        return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
     }
 }
