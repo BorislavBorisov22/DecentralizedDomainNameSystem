@@ -11,29 +11,31 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         bytes4 ip;
         uint expires;
     }
-   
-    // for domains with length more than one hour and
-    uint[] lengthPriceIncreases = [
-        100000000000000000,
-        50000000000000000,
-        40000000000000000,
-        30000000000000000,
+
+    uint[] priceChanges = [
+        5000000000000000,
+        10000000000000000,
         20000000000000000,
-        10000000000000000
+        50000000000000000,
+        100000000000000000
     ];
-   
+
+    uint DECREASE_PRICE_START_INDEX = 15;
+    uint INCREASE_PRICE_START_INDEX = 10;
+
+    bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
+
+    uint public constant MIN_DOMAIN_PRICE = 1 ether;
+    uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
+    uint public constant MIN_DOMAIN_NAME_LENGTH = 5;
+
+    uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
+
     mapping(bytes => DomainInfo) domainNameToDomainInfo;
     mapping(bytes => address) domainNameToOwner;
-   
+
     mapping(address => Receipt[]) addressToReceipts;
-   
-    // constants
-    uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
-    uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
-    uint public DOMAIN_START_PRICE = 1 ether;
-   
-    uint MIN_DOMAIN_NAME_LENGTH = 5;
-   
+
     event LogDomainRegistered(address owner, bytes domain, bytes4 ip, uint expiresIn);
     event LogDomainExtended(address owner, bytes domain, bytes4 ip, uint expiresIn);
     event LogIpEdited(address owner, bytes domain, bytes4 oldIp, bytes4 newIp);
@@ -45,7 +47,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     }
    
     modifier validDomainName(bytes domainName) {
-        require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != bytes1(0x0));
+        require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != BYTES_DEFAULT_VALUE);
         _;
     }
  
@@ -107,8 +109,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     }
    
     function getPrice(bytes domain) public view returns (uint) {
-        domain = domain;
-        return DOMAIN_REGISTRATION_PRICE;
+        return getNewDomainPrice(domain);
     }
    
     function getReceipts(address account) public view returns (Receipt[]) {
@@ -121,7 +122,38 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         ip = domainNameToDomainInfo[domain].ip;
     }
    
-    function getNewPrice(bytes domainName) public pure returns(uint) {
-       
+    function getNewDomainPrice(bytes domainName) internal view returns(uint) {
+        uint increasePriceAmount = 0;
+        uint decreasePriceAmount = 0;
+
+        int pricesIndex = 0;
+        uint domainNameIndex = DECREASE_PRICE_START_INDEX;
+        // 5 is priceChanges length => hardcoded for less gas expenses
+        while (
+            domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
+            uint(pricesIndex) < 5 &&
+            DOMAIN_REGISTRATION_PRICE - priceChanges[uint(pricesIndex)] >= 0) {
+
+            decreasePriceAmount = priceChanges[uint(pricesIndex)];
+            pricesIndex++;
+            domainNameIndex++;
+        }
+        
+        // if there were any changes made in decreasing price
+        // there is no point in calculating increaing of the price
+        if (decreasePriceAmount > 0) {
+            return DOMAIN_REGISTRATION_PRICE - decreasePriceAmount;
+        }
+
+        // also trying to save gas
+        pricesIndex = 4;
+        domainNameIndex = INCREASE_PRICE_START_INDEX;
+        while (domainName[domainNameIndex] == BYTES_DEFAULT_VALUE && pricesIndex >= 0) {
+            increasePriceAmount = priceChanges[uint(pricesIndex)];
+            pricesIndex--;
+            domainNameIndex--;
+        }
+
+        return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
     }
 }
