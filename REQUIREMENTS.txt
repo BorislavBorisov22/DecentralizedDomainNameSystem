@@ -7,20 +7,20 @@ CONTRACT
     (10%) (lecture 6) Public method that returns a list of all receipts by a certain account. A receipt is a domain
     purchase/extension and contains the price, timestamp of purchase and expiration date of the - DONE
 
-    EARNED: 60%;
+    My: 60%;
     TOTAL: 60%;
 
 UNIT TESTING
 
     (40%) (lecture 10) Unit tests for all the methods in your contract (including all aforementioned) ---
 
-    EARNED: 0%
+    My: 0%
     TOTAL: 40%;
 
 OPTIONAL TASKS
     (5%) (lecture 5) Use contract events to signify that an activity has taken place in your contract. Events can - DONE
     (20%) (lecture 8) Create a basic website with MetaMask that connects to a contract (published in a test net ---
-    (5%) (lecture 6) Dynamic pricing. For DDNS, the base price can increase if a short domain name is bought. ---
+    (5%) (lecture 6) Dynamic pricing. For DDNS, the base price can increase if a short domain name is bought. - DONe
 
-    EARNED: 5%;
+    My: 10%;
     TOTAL: 30%
