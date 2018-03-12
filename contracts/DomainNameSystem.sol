@@ -16,9 +16,9 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     uint[] lengthPriceIncreases = [
         100000000000000000,
         50000000000000000,
-        40000000000000000
+        40000000000000000,
         30000000000000000,
-        20000000000000000
+        20000000000000000,
         10000000000000000
     ];
    

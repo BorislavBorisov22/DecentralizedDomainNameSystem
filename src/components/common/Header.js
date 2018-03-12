@@ -19,7 +19,7 @@ const Header = () => {
                 <li><a href="#">About</a></li>
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
-                <li><a href="../navbar-fixed-top/">My Domains</a></li>
+                <li><a>My Domains</a></li>
                 </ul>
             </div>
             </div>

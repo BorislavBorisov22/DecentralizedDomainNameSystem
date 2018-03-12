@@ -91,98 +91,122 @@ contract DomainNameSystemBase {
 
 contract DomainNameSystem is Killable, DomainNameSystemBase {
     using SafeMath for uint256;
-    //  struct Receipt{
-    //     uint amountPaidWei;
-    //     uint timestamp;
-    //     uint expires;
-    // }
-
+   
     struct DomainInfo {
         bytes4 ip;
-        uint expireTime;
+        uint expires;
     }
-
-    uint constant minDomainName = 5;
-    uint constant domainPrice = 1 ether;
-    uint constant domainValidPeriod = 1 years;
-
-    mapping(address => Receipt[]) receiptsByAddress;
-
-    mapping(bytes => address) domainNameToOwner;
+   
+    // for domains with length more than one hour and
+    uint[] lengthPriceIncreases = [
+        100000000000000000,
+        50000000000000000,
+        40000000000000000,
+        30000000000000000,
+        20000000000000000,
+        10000000000000000
+    ];
+   
     mapping(bytes => DomainInfo) domainNameToDomainInfo;
-
-    event DomainRegistered(bytes domainName, bytes4 domainIp, address domainOwner, uint domainExpires);
-    event DomainTransferred(bytes domainName, address oldOwner, address newOwner);
-    event DomainEdited(bytes domainName, bytes4 oldIp, bytes4 newIp);
-    
-    modifier ValidDomainLength(bytes domain) {
-        require(domain[minDomainName - 1] != bytes1(0x0));
+    mapping(bytes => address) domainNameToOwner;
+   
+    mapping(address => Receipt[]) addressToReceipts;
+   
+    // constants
+    uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
+    uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
+    uint public DOMAIN_START_PRICE = 1 ether;
+   
+    uint MIN_DOMAIN_NAME_LENGTH = 5;
+   
+    event LogDomainRegistered(address owner, bytes domain, bytes4 ip, uint expiresIn);
+    event LogDomainExtended(address owner, bytes domain, bytes4 ip, uint expiresIn);
+    event LogIpEdited(address owner, bytes domain, bytes4 oldIp, bytes4 newIp);
+    event LogDomainTransferred(bytes domain, address oldOwner, address newOwner);
+   
+    modifier canRegisterDomain(bytes domainName) {
+        require(isDomainOwner(msg.sender, domainName) || domainAvailableForRegistration(domainName));
         _;
     }
-
-    modifier DomainOwnerOnly(bytes domain) {
-        require(domainNameToOwner[domain] == msg.sender);
-        require(domainNameToDomainInfo[domain].expireTime > now);
+   
+    modifier validDomainName(bytes domainName) {
+        require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != bytes1(0x0));
         _;
     }
-
-    function register(bytes domain, bytes4 ip) public payable ValidDomainLength(domain) {
-        // check if the calling address is the domain owner or if the domain has expired and can be bought by another address
-        require(domainNameToOwner[domain] == msg.sender || domainNameToDomainInfo[domain].expireTime < now);
-        require(msg.value >= domainPrice);
-
-        uint expireTime =
-            domainNameToDomainInfo[domain].expireTime < now || domainNameToOwner[domain] != msg.sender ?
-            now.add(domainValidPeriod) :
-            domainNameToDomainInfo[domain].expireTime.add(domainValidPeriod);
-        
-        domainNameToDomainInfo[domain].expireTime = expireTime;
+ 
+    function isDomainOwner(address adr, bytes domainName) public view returns(bool) {
+        return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
+    }
+   
+    function domainAvailableForRegistration(bytes domainName) public view returns(bool) {
+        return domainNameToDomainInfo[domainName].expires < now;
+    }
+ 
+    function register(bytes domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
+        require(msg.value >= DOMAIN_REGISTRATION_PRICE);
+       
         domainNameToDomainInfo[domain].ip = ip;
-
-        domainNameToOwner[domain] = msg.sender;
-
-        receiptsByAddress[msg.sender].push(
-            Receipt({
-            amountPaidWei: msg.value,
+        if (isDomainOwner(msg.sender, domain)) {
+            uint newExpiryPeriod = domainAvailableForRegistration(domain) ?
+                now.add(DOMAIN_REGISTRATION_EXPIRY_PERIOD) :
+                domainNameToDomainInfo[domain].expires.add(DOMAIN_REGISTRATION_EXPIRY_PERIOD);
+               
+            domainNameToDomainInfo[domain].expires = newExpiryPeriod;
+            LogDomainRegistered(msg.sender, domain, ip, newExpiryPeriod);
+        } else {
+            domainNameToDomainInfo[domain].expires = now.add(DOMAIN_REGISTRATION_EXPIRY_PERIOD);
+            domainNameToOwner[domain] = msg.sender;
+           
+            LogDomainExtended(msg.sender, domain, ip, domainNameToDomainInfo[domain].expires);
+        }
+       
+        Receipt memory newReceipt = Receipt({
+            amountPaidWei: DOMAIN_REGISTRATION_PRICE,
             timestamp: now,
-            expires: expireTime
-        }));
-
-        DomainRegistered(domain, ip, owner, expireTime);
+            expires: domainNameToDomainInfo[domain].expires
+        });
+       
+        addressToReceipts[msg.sender].push(newReceipt);
     }
-    
-    function edit(bytes domain, bytes4 newIp) public DomainOwnerOnly(domain) {
+   
+    function edit(bytes domain, bytes4 newIp) public {
+        require(isDomainOwner(msg.sender, domain));
+       
         bytes4 oldIp = domainNameToDomainInfo[domain].ip;
         domainNameToDomainInfo[domain].ip = newIp;
-
-        DomainEdited(domain, oldIp, newIp);
+       
+        LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
-    
-    function transferDomain(bytes domain, address newOwner) public DomainOwnerOnly(domain) {
-        require(newOwner != address(0x0));
-
+   
+    function transferDomain(bytes domain, address newOwner) public {
+        require(isDomainOwner(msg.sender, domain));
+       
         address oldOwner = domainNameToOwner[domain];
         domainNameToOwner[domain] = newOwner;
-
-        DomainTransferred(domain, oldOwner, newOwner);
+       
+        LogDomainTransferred(domain, oldOwner, newOwner);
     }
-    
+   
     function getIP(bytes domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
-    
+   
     function getPrice(bytes domain) public view returns (uint) {
         domain = domain;
-        return 1 ether;
+        return DOMAIN_REGISTRATION_PRICE;
     }
-    
+   
     function getReceipts(address account) public view returns (Receipt[]) {
-        return receiptsByAddress[account];
+        return addressToReceipts[account];
     }
-
-    function getDomainInfo(bytes domain) public view returns(uint expires, bytes4 ip, address domainOwner) {
-        expires = domainNameToDomainInfo[domain].expireTime;
+   
+    function getDomainInfo(bytes domain) public view returns (address owner, uint expires, bytes4 ip) {
+        owner = domainNameToOwner[domain];
+        expires = domainNameToDomainInfo[domain].expires;
         ip = domainNameToDomainInfo[domain].ip;
-        domainOwner = domainNameToOwner[domain];
+    }
+   
+    function getNewPrice(bytes domainName) public pure returns(uint) {
+       
     }
 }
