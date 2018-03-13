@@ -6,6 +6,7 @@ import routes from './routes';
 import { Provider } from 'react-redux';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/toastr/build/toastr.min.css';
+import '../node_modules/bootstrap/dist/css/bootstrap-theme.min.css';
 import configureStore from './store/configureStore';
 import { Web3Provider } from "react-web3";
 
@@ -14,7 +15,7 @@ const store = configureStore();
 
 render(
     <Provider store={store}>
-        <Web3Provider>
+        <Web3Provider passive={true}>
             <Router history={browserHistory} routes={routes} />
         </Web3Provider>
     </Provider>,

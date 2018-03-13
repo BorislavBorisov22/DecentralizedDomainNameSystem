@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 const Header = ({ activeAddress }) => {
-    console.log(activeAddress);
     return (
         <nav className="navbar navbar-default">
             <div className="container-fluid">
@@ -17,11 +17,12 @@ const Header = ({ activeAddress }) => {
             </div>
             <div id="navbar" className="navbar-collapse collapse" aria-expanded="false" style={{height: '1px'}}>
                 <ul className="nav navbar-nav">
-                <li className="active"><a href="#">Home</a></li>
-                <li><a href="#">About</a></li>
+                <li className="active"><Link to=".">Home</Link></li>
+                <li><Link to="/search-domains">Search Domains</Link></li>
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
-                <li><a>My Domains</a></li>
+                <li><a href="#">your account: <span className="text-primary">{activeAddress}</span></a></li>
+                <li><a><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/></a></li>
                 </ul>
             </div>
             </div>
