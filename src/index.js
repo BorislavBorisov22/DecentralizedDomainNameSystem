@@ -6,8 +6,13 @@ import routes from './routes';
 import { Provider } from 'react-redux';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/toastr/build/toastr.min.css';
+import configureStore from './store/configureStore';
+
+const store = configureStore();
 
 render(
-    <Router history={browserHistory} routes={routes} />,
+    <Provider store={store}>
+        <Router history={browserHistory} routes={routes} />
+    </Provider>,
     document.getElementById('app')
 );

@@ -1,0 +1,2 @@
+export const WEB3_RECEIVE_ACCOUNT = 'web3/RECEIVE_ACCOUNT';
+export const WEB3_CHANGE_ACCOUNT = 'web3/CHANGE_ACCOUNT';

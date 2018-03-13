@@ -24,3 +24,6 @@ OPTIONAL TASKS
 
     My: 10%;
     TOTAL: 30%
+
+MY: 70%
+TOTAL: 130%
