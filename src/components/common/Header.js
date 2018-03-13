@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
 
-const Header = () => {
+const Header = ({ activeAddress }) => {
+    console.log(activeAddress);
     return (
         <nav className="navbar navbar-default">
             <div className="container-fluid">
@@ -27,4 +29,14 @@ const Header = () => {
     );
 };
 
-export default Header;
+Header.propTypes = {
+    activeAddress: PropTypes.string.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        activeAddress: state.activeAddress
+    };
+}
+
+export default connect(mapStateToProps)(Header);

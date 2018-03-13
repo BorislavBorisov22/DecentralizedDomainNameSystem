@@ -4096,6 +4096,12 @@ react-transform-hmr@^1.0.3:
     global "^4.3.0"
     react-proxy "^1.1.7"
 
+react-web3@^0.4.5:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/react-web3/-/react-web3-0.4.5.tgz#c89b9fa51d02be26dcf02e59ee39fbf0d54b6805"
+  dependencies:
+    lodash "^4.17.4"
+
 react@15.0.2:
   version "15.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-15.0.2.tgz#63b95dfda563018a20c182300651ed933e0dd30c"
