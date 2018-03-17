@@ -40,7 +40,8 @@ class SearchDomainPage extends React.Component {
         this.props.actions.searchDomain(this.state.domain.name);
     }
 
-    addDomainToCart(domain) {
+    addDomainToCart() {
+        this.props.actions.addDomainToCard(this.state.searchedDomain)
     }
 
     render() {
@@ -51,7 +52,7 @@ class SearchDomainPage extends React.Component {
                     onChange={this.updateSearchedDomain}
                     onSearch={this.searchForDomain}
                     errors={this.state.errors} />
-                {this.props.searchedDomain && <SearchedDomain domain={this.props.searchedDomain}/>}
+                {this.props.searchedDomain && <SearchedDomain onClick={this.addDomainToCart} domain={this.props.searchedDomain}/>}
             </div>
         );
     }
