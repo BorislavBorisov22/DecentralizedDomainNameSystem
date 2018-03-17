@@ -1,8 +1,10 @@
 import { combineReducers } from "redux";
 import activeAddress from './accountReducer';
+import searchedDomain from './searchDomainReducer';
 
 const rootReducer = combineReducers({
-    activeAddress
+    activeAddress,
+    searchedDomain
 });
 
 export default rootReducer;

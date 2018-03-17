@@ -1,7 +1,12 @@
 
-import React from 'react';
+import React, {PropTypes} from 'react';
 import TextInput from './../common/TextInput';
 import SearchDomainForm from './searchDomainForm';
+import getDdnsContract from './../../blockchain/ddns-contract';
+import * as searchDomainActions from '../../actions/searchDomainActions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import SearchedDomain from './searchedDomain';
 
 class SearchDomainPage extends React.Component {
     constructor(props, context) {
@@ -16,6 +21,7 @@ class SearchDomainPage extends React.Component {
 
         this.updateSearchedDomain = this.updateSearchedDomain.bind(this);
         this.searchForDomain = this.searchForDomain.bind(this);
+        this.addDomainToCart = this.addDomainToCart.bind(this);
     }
 
     updateSearchedDomain(event) {
@@ -31,18 +37,41 @@ class SearchDomainPage extends React.Component {
     }
 
     searchForDomain() {
-        // console.log('searching for domain', this.state.domain.name);
+        this.props.actions.searchDomain(this.state.domain.name);
+    }
+
+    addDomainToCart(domain) {
     }
 
     render() {
         return (
-            <SearchDomainForm
-                domain={this.state.domain}
-                onChange={this.updateSearchedDomain}
-                onSearch={this.searchForDomain}
-                errors={this.state.errors} />
+            <div>
+                <SearchDomainForm
+                    domain={this.state.domain}
+                    onChange={this.updateSearchedDomain}
+                    onSearch={this.searchForDomain}
+                    errors={this.state.errors} />
+                {this.props.searchedDomain && <SearchedDomain domain={this.props.searchedDomain}/>}
+            </div>
         );
     }
 }
 
-export default SearchDomainPage;
+SearchDomainPage.propTypes = {
+    actions: PropTypes.object.isRequired,
+    searchedDomain: PropTypes.object.isRequired
+};
+
+function mapStateToProps(state, props) {
+    return {
+        searchedDomain: state.searchedDomain
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(searchDomainActions, dispatch)
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchDomainPage);
