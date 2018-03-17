@@ -21,6 +21,8 @@ contract Owned {
     }
 }
 
+
+
 contract Killable is Owned {
 
     function kill() public OwnerOnly {
@@ -143,7 +145,8 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     }
  
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
-        require(msg.value >= DOMAIN_REGISTRATION_PRICE);
+        uint newDomainPrice = getNewDomainPrice(domain);
+        require(msg.value >= newDomainPrice);
        
         domainNameToDomainInfo[domain].ip = ip;
         if (isDomainOwner(msg.sender, domain)) {
@@ -159,7 +162,9 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
            
             LogDomainExtended(msg.sender, domain, ip, domainNameToDomainInfo[domain].expires);
         }
-       
+
+        DOMAIN_REGISTRATION_PRICE = newDomainPrice;
+
         Receipt memory newReceipt = Receipt({
             amountPaidWei: DOMAIN_REGISTRATION_PRICE,
             timestamp: now,
@@ -232,11 +237,11 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         pricesIndex = 0;
         domainNameIndex = INCREASE_PRICE_START_INDEX;
         while (
-            (domainNameIndex >= domainName.length || domainName[domainNameIndex] == BYTES_DEFAULT_VALUE)
-            && pricesIndex >= 0) {
+            domainName[domainNameIndex] == BYTES_DEFAULT_VALUE
+            && pricesIndex < 5) {
 
             increasePriceAmount = priceChanges[uint(pricesIndex)];
-            pricesIndex--;
+            pricesIndex++;
             domainNameIndex--;
         }
 

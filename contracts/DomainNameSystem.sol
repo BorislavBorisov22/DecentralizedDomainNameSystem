@@ -60,7 +60,8 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     }
  
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
-        require(msg.value >= DOMAIN_REGISTRATION_PRICE);
+        uint newDomainPrice = getNewDomainPrice(domain);
+        require(msg.value >= newDomainPrice);
        
         domainNameToDomainInfo[domain].ip = ip;
         if (isDomainOwner(msg.sender, domain)) {
@@ -76,7 +77,9 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
            
             LogDomainExtended(msg.sender, domain, ip, domainNameToDomainInfo[domain].expires);
         }
-       
+
+        DOMAIN_REGISTRATION_PRICE = newDomainPrice;
+
         Receipt memory newReceipt = Receipt({
             amountPaidWei: DOMAIN_REGISTRATION_PRICE,
             timestamp: now,

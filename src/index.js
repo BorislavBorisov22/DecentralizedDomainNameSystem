@@ -10,12 +10,11 @@ import '../node_modules/bootstrap/dist/css/bootstrap-theme.min.css';
 import configureStore from './store/configureStore';
 import { Web3Provider } from "react-web3";
 
-
 const store = configureStore();
 
 render(
     <Provider store={store}>
-        <Web3Provider passive={true}>
+        <Web3Provider>
             <Router history={browserHistory} routes={routes} />
         </Web3Provider>
     </Provider>,
