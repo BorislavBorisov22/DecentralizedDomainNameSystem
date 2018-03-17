@@ -6,7 +6,7 @@ const SearchedDomain = ({ domain, onClick }) => {
     return (
         <div>
             <div className="container">
-                <div className="row" style={{display: 'flex', 'justify-content': 'space-between'}}>
+                <div className="row" style={{display: 'flex', 'justifyContent': 'space-between'}}>
                     <div className="col-sm-3 col-md-3">
                         <div className="well">
                         <h2 className="text-warning">{domain.domainName}</h2>

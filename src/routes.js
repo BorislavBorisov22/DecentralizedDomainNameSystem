@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, IndexRoute, Redirect } from 'react-router';
 import App from './components/App';
 import HomePage from './components/home/HomePage';
-import SearchDomainPage from './components/domains/searchDomainPage';
+import SearchDomainPage from './components/domains/SearchDomainPage';
 
 export default (
     <Route path="/" component={App}>

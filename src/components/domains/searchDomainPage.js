@@ -1,12 +1,13 @@
 
 import React, {PropTypes} from 'react';
 import TextInput from './../common/TextInput';
-import SearchDomainForm from './searchDomainForm';
+import SearchDomainForm from './SearchDomainForm';
 import getDdnsContract from './../../blockchain/ddns-contract';
 import * as searchDomainActions from '../../actions/searchDomainActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import SearchedDomain from './searchedDomain';
+import SearchedDomain from './SearchedDomain';
+import { addDomainToShoppingCard } from './../../actions/shoppingCartActions';
 
 class SearchDomainPage extends React.Component {
     constructor(props, context) {
@@ -41,7 +42,8 @@ class SearchDomainPage extends React.Component {
     }
 
     addDomainToCart() {
-        this.props.actions.addDomainToCard(this.state.searchedDomain)
+        this.props.actions.addDomainToShoppingCard(this.state.searchedDomain);
+        this.props.actions.clearSearchedDomain();
     }
 
     render() {
@@ -71,7 +73,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(searchDomainActions, dispatch)
+        actions: bindActionCreators(Object.assign({}, searchDomainActions, { addDomainToShoppingCard }), dispatch)
     };
 }
 
