@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
-const Header = ({ activeAddress }) => {
+const Header = ({ activeAddress, cartItemsCount }) => {
     return (
         <nav className="navbar navbar-default">
             <div className="container-fluid">
@@ -22,7 +22,7 @@ const Header = ({ activeAddress }) => {
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">your account: <span className="text-primary">{activeAddress}</span></a></li>
-                <li><a><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/></a></li>
+                <li><a href="cart"><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/>({cartItemsCount})</a></li>
                 </ul>
             </div>
             </div>
@@ -31,7 +31,8 @@ const Header = ({ activeAddress }) => {
 };
 
 Header.propTypes = {
-    activeAddress: PropTypes.string.isRequired
+    activeAddress: PropTypes.string.isRequired,
+    cartItemsCount: PropTypes.number.isRequired
 };
 
 function mapStateToProps(state) {
@@ -40,4 +41,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Header);
+export default Header;

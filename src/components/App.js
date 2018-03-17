@@ -6,7 +6,7 @@ class App extends React.Component {
     render() {
         return (
             <div className="container">
-                <Header />
+                <Header activeAddress={this.props.activeAddress} cartItemsCount={this.props.cartItemsCount} />
                 {this.props.children}
             </div>
         );
@@ -14,12 +14,15 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-    children: PropTypes.object.isRequired
+    children: PropTypes.object.isRequired,
+    activeAddress: PropTypes.string.isRequired,
+    cartItemsCount: PropTypes.number.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
     return {
-
+        activeAddress: state.activeAddress,
+        cartItemsCount: state.shoppingCart.length
     };
 }
 
