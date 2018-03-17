@@ -22,7 +22,10 @@ const Header = ({ activeAddress, cartItemsCount }) => {
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">your account: <span className="text-primary">{activeAddress}</span></a></li>
-                <li><a href="cart"><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/>({cartItemsCount})</a></li>
+                <li><Link to="/cart"><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/>
+                    ({cartItemsCount})
+                    </Link>
+                </li>
                 </ul>
             </div>
             </div>

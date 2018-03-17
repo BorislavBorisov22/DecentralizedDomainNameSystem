@@ -42,8 +42,13 @@ class SearchDomainPage extends React.Component {
     }
 
     addDomainToCart() {
-        this.props.actions.addDomainToShoppingCard(this.state.searchedDomain);
+        this.props.actions.addDomainToShoppingCard(this.props.searchedDomain);
         this.props.actions.clearSearchedDomain();
+        this.setState({
+            domain: {
+                name: ''
+            }
+        });
     }
 
     render() {
@@ -62,7 +67,7 @@ class SearchDomainPage extends React.Component {
 
 SearchDomainPage.propTypes = {
     actions: PropTypes.object.isRequired,
-    searchedDomain: PropTypes.object.isRequired
+    searchedDomain: PropTypes.object
 };
 
 function mapStateToProps(state, props) {
