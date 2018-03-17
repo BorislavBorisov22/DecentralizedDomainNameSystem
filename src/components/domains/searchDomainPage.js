@@ -7,7 +7,7 @@ import * as searchDomainActions from '../../actions/searchDomainActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import SearchedDomain from './SearchedDomain';
-import { addDomainToShoppingCard } from './../../actions/shoppingCartActions';
+import { addDomainToShoppingCart } from './../../actions/shoppingCartActions';
 
 class SearchDomainPage extends React.Component {
     constructor(props, context) {
@@ -42,7 +42,7 @@ class SearchDomainPage extends React.Component {
     }
 
     addDomainToCart() {
-        this.props.actions.addDomainToShoppingCard(this.props.searchedDomain);
+        this.props.actions.addDomainToShoppingCart(this.props.searchedDomain);
         this.props.actions.clearSearchedDomain();
         this.setState({
             domain: {
@@ -78,7 +78,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(Object.assign({}, searchDomainActions, { addDomainToShoppingCard }), dispatch)
+        actions: bindActionCreators(Object.assign({}, searchDomainActions, { addDomainToShoppingCart }), dispatch)
     };
 }
 

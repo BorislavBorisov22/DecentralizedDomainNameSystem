@@ -1,6 +1,11 @@
 import React, {PropTypes} from 'react';
 
-const ShoppingCartListRow = ({domain}) => {
+const ShoppingCartListRow = ({domain, removeDomain}) => {
+
+    const onRemoveClickd = () => {
+        removeDomain(domain);
+    };
+
     return (
         <tr>
         <td className="col-sm-8 col-md-6">
@@ -19,7 +24,7 @@ const ShoppingCartListRow = ({domain}) => {
         </td>
         <td className="col-sm-1 col-md-1 text-center"><strong>{domain.price}</strong></td>
         <td className="col-sm-1 col-md-1">
-        <button type="button" className="btn btn-danger">
+        <button onClick={onRemoveClickd} type="button" className="btn btn-danger">
             Remove
         </button></td>
     </tr>
@@ -27,7 +32,8 @@ const ShoppingCartListRow = ({domain}) => {
 };
 
 ShoppingCartListRow.propTypes = {
-    domain: PropTypes.object.isRequired
+    domain: PropTypes.object.isRequired,
+    removeDomain: PropTypes.func.isRequired
 };
 
 export default ShoppingCartListRow;
