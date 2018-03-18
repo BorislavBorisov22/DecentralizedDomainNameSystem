@@ -60,7 +60,7 @@ class SearchDomainPage extends React.Component {
     }
 
     navigateToDomainPage() {
-        this.context.router.push('/edit');
+        this.context.router.push({ pathname: 'edit', query: this.props.searchedDomain});
     }
 
     render() {

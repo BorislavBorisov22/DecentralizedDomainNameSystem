@@ -6,8 +6,12 @@ export class EditDomainPage extends React.Component {
     }
 
     render() {
-        return (<h1>Edit Domain Works</h1>);
+        return (<h1>Editing {this.props.location.query.domainName}</h1>);
     }
 }
+
+EditDomainPage.propTypes = {
+    location: PropTypes.object.isRequired
+};
 
 export default EditDomainPage;
