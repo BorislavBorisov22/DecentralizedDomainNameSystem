@@ -58,8 +58,8 @@ class SearchDomainPage extends React.Component {
         });
     }
 
-    navigateToDomainEdit(domain) {
-        
+    naviateToEditDomain(domain) {
+        this.context.router.push('/edit');
     }
 
     render() {
@@ -80,6 +80,10 @@ SearchDomainPage.propTypes = {
     actions: PropTypes.object.isRequired,
     searchedDomain: PropTypes.object,
     activeAccount: PropTypes.string
+};
+
+SearchDomainPage.contextTypes = {
+    router: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state, props) {
