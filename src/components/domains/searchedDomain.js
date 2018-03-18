@@ -17,7 +17,7 @@ const SearchedDomain = ({ domain, onClick, activeAccount }) => {
                         <ul>
                             <li>Owned by - {domain.owner === activeAccount ? 'you' : domain.owner}</li>
                             <li>Current ip address - {domain.ip}</li>
-                            <li>expires - {expiresDateFormat.getDate()}/{expiresDateFormat.getMonth()}/{expiresDateFormat.getFullYear()}
+                            <li>expires - {expiresDateFormat.getDate()}/{expiresDateFormat.getMonth() + 1}/{expiresDateFormat.getFullYear()}
 
                              &nbsp;&nbsp;{expiresDateFormat.getHours()}:{expiresDateFormat.getMinutes()}
                             </li>
@@ -25,8 +25,8 @@ const SearchedDomain = ({ domain, onClick, activeAccount }) => {
                         <hr/>
                         <h3>{domain.price} ETH / year</h3>
                         <hr/>
-                        <p onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></p>
                         {activeAccount === domain.owner && <p onClick={onClick}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></p>}
+                        <p onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></p>
                         </div>
                     </div>
                 </div>
