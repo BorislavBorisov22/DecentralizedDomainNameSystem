@@ -11,11 +11,10 @@ export function clearSearchedDomain() {
 }
 
 export function searchDomain(domainName) {
-    return function(dipsatch) {
+    return function(dispatch) {
         const contract = getddnsContract();
-        return contract.getDomainPrice(domainName)
-            .then(price => {
-                dipsatch(searchDomainSuccess({ domainName, price}));
-            });
+        return contract.getDomain(domainName).then(resDomain => {
+            dispatch(searchDomainSuccess(resDomain));
+        });
     };
 }

@@ -1,19 +1,22 @@
 import React, {PropTypes} from 'react';
 
-const ShoppingCartListRow = ({domain, removeDomain, addDomainIp}) => {
+const ShoppingCartListRow = ({domain, removeDomain, addDomainIp, buyDomain}) => {
 
     const onRemoveClickd = () => {
         removeDomain(domain);
     };
 
     const onIpInputChange = (event) => {
-        console.log('changess...')
         addDomainIp(domain, event.target.value);
+    };
+
+    const onBuyDomainClicked = () => {
+        buyDomain(domain);
     };
 
     return (
         <tr>
-        <td className="col-sm-8 col-md-6">
+        <td className="col-sm-8 col-md-5">
         <div className="media">
             <a className="thumbnail pull-left" href="#"> <img className="media-object" src="http://shawnwrightdigitalmarketing.com/wp-content/uploads/2017/12/487801-1NhDLy1477425888.jpg" style={{width: '72px', height: '72px'}} /> </a>
             <div className="media-body">
@@ -28,9 +31,12 @@ const ShoppingCartListRow = ({domain, removeDomain, addDomainIp}) => {
         <input onChange={onIpInputChange} className="form-control" id="exampleInputEmail1" value={domain.ip} />
         </td>
         <td className="col-sm-1 col-md-1 text-center"><strong>{domain.price}</strong></td>
-        <td className="col-sm-1 col-md-1">
+        <td className="col-sm-1 col-md-2">
+        <button onClick={onBuyDomainClicked} type="button" className="btn btn-success">
+            Buy
+        </button> 
         <button onClick={onRemoveClickd} type="button" className="btn btn-danger">
-            Remove
+            X
         </button></td>
     </tr>
     );

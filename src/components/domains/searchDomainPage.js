@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import SearchedDomain from './SearchedDomain';
 import { addDomainToShoppingCart } from './../../actions/shoppingCartActions';
+import toastr from 'toastr';
 
 class SearchDomainPage extends React.Component {
     constructor(props, context) {
@@ -23,6 +24,10 @@ class SearchDomainPage extends React.Component {
         this.updateSearchedDomain = this.updateSearchedDomain.bind(this);
         this.searchForDomain = this.searchForDomain.bind(this);
         this.addDomainToCart = this.addDomainToCart.bind(this);
+    }
+
+    componentDidMount() {
+        toastr.info('Please note that the displayed domain price is relative and might change from the time you search the domain to the time you actually buy it.');
     }
 
     updateSearchedDomain(event) {
@@ -44,6 +49,8 @@ class SearchDomainPage extends React.Component {
     addDomainToCart() {
         this.props.actions.addDomainToShoppingCart(this.props.searchedDomain);
         this.props.actions.clearSearchedDomain();
+
+        toastr.success('Domain added to your shopping cart');
         this.setState({
             domain: {
                 name: ''
@@ -59,7 +66,7 @@ class SearchDomainPage extends React.Component {
                     onChange={this.updateSearchedDomain}
                     onSearch={this.searchForDomain}
                     errors={this.state.errors} />
-                {this.props.searchedDomain && <SearchedDomain onClick={this.addDomainToCart} domain={this.props.searchedDomain}/>}
+                {this.props.searchedDomain && <SearchedDomain activeAccount={this.props.activeAccount} onClick={this.addDomainToCart} domain={this.props.searchedDomain}/>}
             </div>
         );
     }
@@ -67,12 +74,14 @@ class SearchDomainPage extends React.Component {
 
 SearchDomainPage.propTypes = {
     actions: PropTypes.object.isRequired,
-    searchedDomain: PropTypes.object
+    searchedDomain: PropTypes.object,
+    activeAccount: PropTypes.string
 };
 
 function mapStateToProps(state, props) {
     return {
-        searchedDomain: state.searchedDomain
+        searchedDomain: state.searchedDomain,
+        activeAccount: state.activeAddress
     };
 }
 

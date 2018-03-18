@@ -13,7 +13,7 @@ function getContract () {
     const contractInstance = Contract.at(contractConfig.contractAddress);
 
     ddnsContract =  {
-        getDomainPrice(domainName) {
+        domainPrice(domainName) {
             return new Promise((resolve, reject) => {
                 contractInstance.getPrice(domainName, {from: web3.eth.accounts[0]}, (err, res) => {
                     if (err) {
@@ -21,9 +21,44 @@ function getContract () {
                     }
 
                     const priceInEther = web3.fromWei(res.toString(), 'ether');
+
                     resolve(priceInEther);
                 });
             });
+        },
+        domainInfo(domainName) {
+            return new Promise((resolve, reject) => {
+                contractInstance.getDomainInfo(domainName, {from: web3.eth.accounts[0]}, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    const domainInfo = {
+                        owner: res[0],
+                        expires: res[1].toString(),
+                        ip: web3.toUtf8(res[2])
+                    };
+                    resolve(domainInfo);
+                });
+            });
+        },
+        buyDomain(domain) {
+            return new Promise((resolve, reject) => {
+                contractInstance.register(domain.domainName,web3.fromUtf8(domain.ip), {from: web3.eth.accounts[0], value: web3.toWei(domain.price, 'ether')}, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    resolve(res);
+                });
+            });
+        },
+        getDomain(domainName) {
+            return Promise.all([this.domainPrice(domainName), this.domainInfo(domainName)])
+                .then(([price, info]) => {
+                    
+                    return Object.assign({}, {price, domainName}, info);
+                });
         }
     };
 
