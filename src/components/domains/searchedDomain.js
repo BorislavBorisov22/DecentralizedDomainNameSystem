@@ -1,7 +1,7 @@
 
 import React, {PropTypes} from 'react';
 
-const SearchedDomain = ({ domain, onClick, activeAccount }) => {
+const SearchedDomain = ({ domain, onClick, activeAccount, onEdit }) => {
 
     const expiresDateFormat = new Date(Number(domain.expires) * 1000);
     const isAvailable = domain.owner === activeAccount || expiresDateFormat < Date.now();
@@ -25,7 +25,7 @@ const SearchedDomain = ({ domain, onClick, activeAccount }) => {
                         <hr/>
                         <h3>{domain.price} ETH / year</h3>
                         <hr/>
-                        {activeAccount === domain.owner && <p onClick={onClick}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></p>}
+                        {activeAccount === domain.owner && <p onClick={onEdit}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></p>}
                         <p onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></p>
                         </div>
                     </div>
@@ -37,7 +37,8 @@ const SearchedDomain = ({ domain, onClick, activeAccount }) => {
 SearchedDomain.propTypes = {
     domain: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired,
-    activeAccount: PropTypes.string.isRequired
+    activeAccount: PropTypes.string.isRequired,
+    onEdit: PropTypes.func
 };
 
 export default SearchedDomain;
