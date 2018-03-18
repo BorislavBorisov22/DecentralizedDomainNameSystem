@@ -58,6 +58,10 @@ class SearchDomainPage extends React.Component {
         });
     }
 
+    navigateToDomainEdit(domain) {
+        
+    }
+
     render() {
         return (
             <div>
