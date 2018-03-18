@@ -1,9 +1,14 @@
 import React, {PropTypes} from 'react';
 
-const ShoppingCartListRow = ({domain, removeDomain}) => {
+const ShoppingCartListRow = ({domain, removeDomain, addDomainIp}) => {
 
     const onRemoveClickd = () => {
         removeDomain(domain);
+    };
+
+    const onIpInputChange = (event) => {
+        console.log('changess...')
+        addDomainIp(domain, event.target.value);
     };
 
     return (
@@ -19,8 +24,8 @@ const ShoppingCartListRow = ({domain, removeDomain}) => {
         </td>
         <td>
         </td>
-        <td className="col-sm-1 col-md-1" style={{'text-align': 'center'}}>
-        <input type="email" className="form-control" id="exampleInputEmail1" value="3" />
+        <td className="col-sm-3 col-md-3" style={{'text-align': 'center'}}>
+        <input onChange={onIpInputChange} className="form-control" id="exampleInputEmail1" value={domain.ip} />
         </td>
         <td className="col-sm-1 col-md-1 text-center"><strong>{domain.price}</strong></td>
         <td className="col-sm-1 col-md-1">
@@ -33,7 +38,8 @@ const ShoppingCartListRow = ({domain, removeDomain}) => {
 
 ShoppingCartListRow.propTypes = {
     domain: PropTypes.object.isRequired,
-    removeDomain: PropTypes.func.isRequired
+    removeDomain: PropTypes.func.isRequired,
+    addDomainIp: PropTypes.func.isRequired
 };
 
 export default ShoppingCartListRow;

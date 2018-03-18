@@ -3,23 +3,28 @@ import React, {PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import ShoppingCartList from './ShoppingCartList';
-import { removeDomainFromCart } from '../../actions/shoppingCartActions';
+import { removeDomainFromCart, addIpToDomain } from '../../actions/shoppingCartActions';
 
 class ShoppingCartPage extends React.Component {
     constructor(props, context) {
         super(props, context);
 
         this.removeDomain = this.removeDomain.bind(this);
+        this.addDomainIp = this.addDomainIp.bind(this);
     }
 
     removeDomain(domain) {
         this.props.actions.removeDomainFromCart(domain);
     }
 
+    addDomainIp(domain, ip) {
+        this.props.actions.addIpToDomain(Object.assign({}, domain, { ip }));
+    }
+
     render() {
         return (
             <div>
-                <ShoppingCartList domains={this.props.domains} removeDomain={this.removeDomain}/>
+                <ShoppingCartList domains={this.props.domains} addDomainIp={this.addDomainIp} removeDomain={this.removeDomain}/>
             </div>
         );
     }
@@ -38,7 +43,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ removeDomainFromCart }, dispatch)
+        actions: bindActionCreators({ removeDomainFromCart, addIpToDomain }, dispatch)
     };
 }
 

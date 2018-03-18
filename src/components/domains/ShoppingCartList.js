@@ -3,7 +3,7 @@ import React, {PropTypes} from 'react';
 import ShoppingCartListRow from './ShoppingCartListRow';
 import { Link } from 'react-router';
 
-const ShoppingCartList = ({domains, onCheckout, removeDomain}) => {
+const ShoppingCartList = ({domains, onCheckout, removeDomain, addDomainIp}) => {
 
     return (
         <div className="container">
@@ -20,7 +20,7 @@ const ShoppingCartList = ({domains, onCheckout, removeDomain}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {domains.map(d => <ShoppingCartListRow removeDomain={removeDomain} key={d.domainName} domain={d}/>)}
+                    {domains.map(d => <ShoppingCartListRow addDomainIp={addDomainIp} removeDomain={removeDomain} key={d.domainName} domain={d}/>)}
                     <tr>
                         <td>   </td>
                         <td>   </td>
@@ -52,7 +52,8 @@ const ShoppingCartList = ({domains, onCheckout, removeDomain}) => {
 ShoppingCartList.propTypes = {
     domains: PropTypes.array.isRequired,
     onCheckout: PropTypes.func.isRequired,
-    removeDomain: PropTypes.func.isRequired
+    removeDomain: PropTypes.func.isRequired,
+    addDomainIp: PropTypes.func.isRequired
 };
 
 
