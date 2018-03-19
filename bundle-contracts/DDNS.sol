@@ -247,4 +247,8 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
 
         return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
     }
+
+    function contractAddress() public view returns(address) {
+        return address(this);
+    }
 }

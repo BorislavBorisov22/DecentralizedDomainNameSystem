@@ -44,7 +44,7 @@ function getContract () {
         },
         buyDomain(domain) {
             return new Promise((resolve, reject) => {
-                contractInstance.register(domain.domainName,web3.fromUtf8(domain.ip), {from: web3.eth.accounts[0], value: web3.toWei(domain.price, 'ether')}, (err, res) => {
+                contractInstance.register(domain.domainName, web3.fromUtf8(domain.ip), {from: web3.eth.accounts[0], value: web3.toWei(domain.price, 'ether')}, (err, res) => {
                     if (err) {
                         reject(err);
                     }
@@ -59,6 +59,17 @@ function getContract () {
                     
                     return Object.assign({}, {price, domainName}, info);
                 });
+        },
+        editDomain({name, ip}) {
+            return new Promise((resolve, reject) => {
+                contractInstance.edit(name, web3.fromUtf8(ip), {from: web3.eth.accounts[0]}, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    resolve(res);
+                });
+            });
         }
     };
 
