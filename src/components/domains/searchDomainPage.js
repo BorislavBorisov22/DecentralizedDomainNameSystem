@@ -31,6 +31,10 @@ class SearchDomainPage extends React.Component {
         toastr.info('Please note that the displayed domain price is relative and might change from the time you search the domain to the time you actually buy it.');
     }
 
+    componentWillUnmount() {
+        this.props.actions.clearSearchedDomain();
+    }
+
     updateSearchedDomain(event) {
         const value = event.target.value;
         const fieldName = event.target.name;

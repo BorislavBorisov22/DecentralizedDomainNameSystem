@@ -24,8 +24,7 @@ EditDomainForm.propTypes = {
     domain: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired,
-    onSave: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired
 };
 
 export default EditDomainForm;
