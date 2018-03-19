@@ -28,7 +28,7 @@ const ShoppingCartListRow = ({domain, removeDomain, addDomainIp, buyDomain}) => 
         <td>
         </td>
         <td className="col-sm-3 col-md-3" style={{'text-align': 'center'}}>
-        <input onChange={onIpInputChange} className="form-control" id="exampleInputEmail1" value={domain.ip} />
+        <input onChange={onIpInputChange} className="form-control" value={domain.ip} />
         </td>
         <td className="col-sm-1 col-md-1 text-center"><strong>{domain.price}</strong></td>
         <td className="col-sm-1 col-md-2">

@@ -17,12 +17,12 @@ const Header = ({ activeAddress, cartItemsCount }) => {
             </div>
             <div id="navbar" className="navbar-collapse collapse" aria-expanded="false" style={{height: '1px'}}>
                 <ul className="nav navbar-nav">
-                <li className="active"><Link to=".">Home</Link></li>
+                <li><Link to=".">Home</Link></li>
                 <li><Link to="/search-domains">Search Domains</Link></li>
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">your account: <span className="text-primary">{activeAddress}</span></a></li>
-                <li><Link to="/cart"><img style={{height: '40px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/>
+                <li><Link to="/cart"><img style={{height: '15px', width: '50px'}} src="https://cdn3.iconfinder.com/data/icons/ikooni-flat-online-shopping/128/shopping-14-128.png"/>
                     ({cartItemsCount})
                     </Link>
                 </li>

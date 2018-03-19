@@ -3,6 +3,13 @@ import React, {PropTypes} from 'react';
 export class EditDomainPage extends React.Component {
     constructor(props, context) {
         super(props, context);
+
+        this.state = {
+            domain: {
+                name: this.props.location.query.domainName,
+                ip: this.props.location.query.ip
+            }
+        };
     }
 
     render() {
