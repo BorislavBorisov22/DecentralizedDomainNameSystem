@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import TextInput from './../common/TextInput';
 
-const EditDomainForm = ({domain, errors, onSave, onChange}) => {
+const EditDomainForm = ({domain, errors, onSave, onChange, saving}) => {
 
     return (
         <div>
@@ -15,7 +15,7 @@ const EditDomainForm = ({domain, errors, onSave, onChange}) => {
 
             <br/>
 
-            <button onClick={onSave} className="btn btn-primary">Save</button>
+            <button onClick={onSave} disabled={saving} className="btn btn-primary">{saving ? 'Saving...' : 'Save'}</button>
         </div>
     );
 };
@@ -24,7 +24,8 @@ EditDomainForm.propTypes = {
     domain: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    saving: PropTypes.bool.isRequired
 };
 
 export default EditDomainForm;

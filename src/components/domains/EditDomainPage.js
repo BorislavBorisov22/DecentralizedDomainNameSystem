@@ -12,7 +12,8 @@ export class EditDomainPage extends React.Component {
                 name: this.props.location.query.domainName,
                 ip: this.props.location.query.ip
             },
-            errors: {}
+            errors: {},
+            saving: false
         };
 
         this.updateDomain = this.updateDomain.bind(this);
@@ -56,9 +57,20 @@ export class EditDomainPage extends React.Component {
         }
 
         const contract = getDdnsContract();
+        this.setState({
+            saving: true
+        });
+
         contract.editDomain(this.state.domain)
             .then(() => {
                 toastr.success('Domain info edited successfully!');
+                this.setState({
+                    saving: false
+                });
+            }).catch(() => {
+                this.setState({
+                    saving: false
+                });
             });
     }
 
@@ -78,6 +90,7 @@ export class EditDomainPage extends React.Component {
                  domain={this.state.domain}
                  onChange={this.updateDomain}
                  onSave={this.editDomain}
+                 saving={this.state.saving}
                  />
             </div>);
     }
