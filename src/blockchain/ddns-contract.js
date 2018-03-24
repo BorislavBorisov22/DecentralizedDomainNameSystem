@@ -55,15 +55,24 @@ function getContract () {
         },
         getDomain(domainName) {
             return Promise.all([this.domainPrice(domainName), this.domainInfo(domainName)])
-                .then(([price, info]) => {
-                    console.log(info, 'info');
-                    
+                .then(([price, info]) => {                    
                     return Object.assign({}, {price, domainName}, info);
                 });
         },
         editDomain({name, ip}) {
             return new Promise((resolve, reject) => {
                 contractInstance.edit(name, web3.fromUtf8(ip), {from: web3.eth.accounts[0]}, (err, res) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    resolve(res);
+                });
+            });
+        },
+        transferDomain(domainName, transferTo) {
+            return new Promise((resolve, reject) => {
+                contractInstance.transferDomain(domainName, transferTo, {from: web3.eth.accounts[0]}, (err, res) => {
                     if (err) {
                         reject(err);
                     }
