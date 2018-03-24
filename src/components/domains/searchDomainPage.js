@@ -25,6 +25,7 @@ class SearchDomainPage extends React.Component {
         this.searchForDomain = this.searchForDomain.bind(this);
         this.addDomainToCart = this.addDomainToCart.bind(this);
         this.navigateToDomainPage = this.navigateToDomainPage.bind(this);
+        this.navigateToTransferPage = this.navigateToTransferPage.bind(this);
     }
 
     componentDidMount() {
@@ -67,6 +68,10 @@ class SearchDomainPage extends React.Component {
         this.context.router.push({ pathname: 'edit', query: this.props.searchedDomain});
     }
 
+    navigateToTransferPage() {
+        this.context.router.push({ pathname: 'transfer', query: this.props.searchedDomain});
+    }
+
     render() {
         return (
             <div>
@@ -80,6 +85,7 @@ class SearchDomainPage extends React.Component {
                      activeAccount={this.props.activeAccount}
                      onClick={this.addDomainToCart}
                      domain={this.props.searchedDomain}
+                     onTransfer={this.navigateToTransferPage}
                      onEdit={this.navigateToDomainPage}/>}
             </div>
         );

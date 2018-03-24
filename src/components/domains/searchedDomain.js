@@ -1,7 +1,7 @@
 
 import React, {PropTypes} from 'react';
 
-const SearchedDomain = ({ domain, onClick, activeAccount, onEdit }) => {
+const SearchedDomain = ({ domain, onClick, activeAccount, onEdit, onTransfer }) => {
 
     const expiresDateFormat = new Date(Number(domain.expires) * 1000);
     const isAvailable = domain.owner === activeAccount || expiresDateFormat < Date.now();
@@ -25,8 +25,11 @@ const SearchedDomain = ({ domain, onClick, activeAccount, onEdit }) => {
                         <hr/>
                         <h3>{domain.price} ETH / year</h3>
                         <hr/>
-                        {activeAccount === domain.owner && <p onClick={onEdit}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></p>}
-                        <p onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></p>
+                        <div className="row" style={{display: 'flex'}}>
+                            <div className="col col-md-1" onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></div>
+                            {activeAccount === domain.owner && <div className="col col-md-1" onClick={onEdit}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></div>}
+                            {activeAccount === domain.owner && <div className="col col-md-1" onClick={onTransfer}><a className="btn btn-danger btn-lg" href="#"><i className="icon-ok"></i> Transfer</a></div>}
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -38,7 +41,8 @@ SearchedDomain.propTypes = {
     domain: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired,
     activeAccount: PropTypes.string.isRequired,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    onTransfer: PropTypes.func
 };
 
 export default SearchedDomain;
