@@ -85,10 +85,6 @@ contract DomainNameSystemBase {
     function getReceipts(address account) public view returns (Receipt[]);
 }
 
-
-
-
-
 contract DomainNameSystem is Killable, DomainNameSystemBase {
     using SafeMath for uint256;
    

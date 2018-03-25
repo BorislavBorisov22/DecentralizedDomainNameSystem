@@ -142,13 +142,10 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
             domainNameIndex++;
         }
         
-        // if there were any changes made in decreasing price
-        // there is no point in calculating increaing of the price
         if (decreasePriceAmount > 0) {
             return DOMAIN_REGISTRATION_PRICE - decreasePriceAmount;
         }
 
-        // also trying to save gas
         pricesIndex = 0;
         domainNameIndex = INCREASE_PRICE_START_INDEX;
         while (
@@ -161,5 +158,9 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         }
 
         return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
+    }
+
+    function contractAddress() public view returns(address) {
+        return address(this);
     }
 }

@@ -8,7 +8,7 @@ contract Killable is Owned {
         selfdestruct(owner);
     }
 
-    function withDrawAndKill(address receiver) public OwnerOnly {
+    function withdrawAndKill(address receiver) public OwnerOnly {
         require(receiver != address(0x0));
         receiver.transfer(this.balance);
         kill();

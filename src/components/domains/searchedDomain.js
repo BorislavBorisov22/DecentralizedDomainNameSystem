@@ -25,8 +25,8 @@ const SearchedDomain = ({ domain, onClick, activeAccount, onEdit, onTransfer }) 
                         <hr/>
                         <h3>{domain.price} ETH / year</h3>
                         <hr/>
-                        <div className="row" style={{display: 'flex'}}>
-                            {isAvailable && <div className="col col-md-1" onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></div>}
+                        <div className="row" style={{display: 'flex', 'justify-content': 'flex-start'}}>
+                            {isAvailable && <div className="col col-md-2" onClick={onClick}><a className="btn btn-success btn-lg" href="#"><i className="icon-ok"></i> Add to cart</a></div>}
                             {activeAccount === domain.owner && <div className="col col-md-1" onClick={onEdit}><a className="btn btn-primary btn-lg" href="#"><i className="icon-ok"></i> Edit</a></div>}
                             {activeAccount === domain.owner && <div className="col col-md-1" onClick={onTransfer}><a className="btn btn-danger btn-lg" href="#"><i className="icon-ok"></i> Transfer</a></div>}
                         </div>
