@@ -50,11 +50,12 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != BYTES_DEFAULT_VALUE);
         _;
     }
- 
+
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
-   
+    
+    // for test
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
