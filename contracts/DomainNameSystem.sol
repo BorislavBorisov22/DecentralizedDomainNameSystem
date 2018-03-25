@@ -51,7 +51,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         _;
     }
 
-    // for testing
+    // tested
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
@@ -60,11 +60,12 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
- 
+    
+    // for test
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         uint newDomainPrice = getNewDomainPrice(domain);
         require(msg.value >= newDomainPrice);
-       
+
         domainNameToDomainInfo[domain].ip = ip;
         if (isDomainOwner(msg.sender, domain)) {
             uint newExpiryPeriod = domainAvailableForRegistration(domain) ?

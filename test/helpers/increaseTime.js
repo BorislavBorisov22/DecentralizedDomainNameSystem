@@ -31,7 +31,7 @@ exports.increaseTime = function(duration) {
  *
  * @param target time in seconds
  */
-exports.increseTimeTo = function(target) {
+exports.increaseTimeTo = function(target) {
     let now = latestTime();
     if (target < now) throw Error(`Cannot increase current time(${now}) to a moment in the past(${target})`);
     let diff = target - now;
