@@ -102,7 +102,6 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         const domainIp = 'some';
         const price = web3.toWei(1.2, 'ether');
 
-        const dur = duration.years(-1);
         const initialTransaction = await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
 
         const [domainOwner, expires, ip] = await sut.getDomainInfo(domainName);
@@ -117,12 +116,11 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         assert(web3.toUtf8(ip) === domainIp);
     });
 
-    it('expect to extend a domain expiry period when domain is registered by it\'s owner while still not expired', async() => {
+    it('expect to extend a domain expiry period by a year when domain is registered by it\'s owner while still not expired', async() => {
         const domainName = 'dddname';
         const domainIp = 'some';
         const price = web3.toWei(1.2, 'ether');
 
-        const dur = duration.years(-1);
         const initialTransaction = await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
         await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
 
@@ -132,6 +130,25 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
 
         const now = web3.eth.getBlock(initialTransaction.receipt.blockNumber).timestamp;
         const expectedExpiryPeriod = expiryPeriod.add(expiryPeriod).add(now);
+
+        assert.deepEqual(expires, expectedExpiryPeriod);
+    });
+
+    it('expect to update domainInfo and expiry period correctly when expired domain is registered from a new owner', async() => {
+        const domainName = 'dddname';
+        const domainIp = 'some';
+        const price = web3.toWei(1.2, 'ether');
+
+        await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
+        await increaseTime(duration.years(1) + duration.minutes(10));
+        const initialTransaction = await sut.register(domainName, web3.fromUtf8(domainIp), { from: accountHelper, value: price});
+
+        const [domainOwner, expires, ip] = await sut.getDomainInfo(domainName);
+
+        const expiryPeriod = await sut.DOMAIN_REGISTRATION_EXPIRY_PERIOD();
+
+        const now = web3.eth.getBlock(initialTransaction.receipt.blockNumber).timestamp;
+        const expectedExpiryPeriod = expiryPeriod.add(now);
 
         assert.deepEqual(expires, expectedExpiryPeriod);
     });
