@@ -51,11 +51,12 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         _;
     }
 
+    // for testing
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
     
-    // for test
+    // tested
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
