@@ -160,7 +160,7 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         const domainIp = 'somedomainIP';
 
         const editPromise = sut.edit(domainName, domainIp);
-        assertRevert(editPromise);
+        await assertRevert(editPromise);
     });
 
     it('expect edit domain to edit domain ip correctly when domain edited by owner', async() => {
@@ -194,5 +194,22 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
 
         const ip = web3.toUtf8(await sut.getIP(domainName));
         assert.equal(ip, domainIp);
+    });
+
+    it('expect transferDomain to rever when trying to transfer domain not owned by sender', async() => {
+        const transferPromise = sut.transferDomain('somedomain', accountHelper, {from: owner});
+        await assertRevert(transferPromise);
+    });
+
+    it('expect to transferDomain to the passed newOwner when transfering domain owned by sender', async() => {
+        const domainName = 'domainname';
+        const domainIp = 'ipip';
+        const price = web3.toWei(1.2, 'ether');
+
+        await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price });
+        await sut.transferDomain(domainName, accountHelper);
+
+        const [domainOwner] = await sut.getDomainInfo(domainName);
+        assert.equal(domainOwner, accountHelper);
     });
 });

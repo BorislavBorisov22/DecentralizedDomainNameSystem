@@ -21,7 +21,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     ];
 
     uint DECREASE_PRICE_START_INDEX = 15;
-    uint INCREASE_PRICE_START_INDEX = 10;
+    uint INCREASE_PRICE_START_INDEX = 10 ;
 
     bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
 
@@ -61,7 +61,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         return domainNameToDomainInfo[domainName].expires < now;
     }
     
-    // for test
+    // tested
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         uint newDomainPrice = getNewDomainPrice(domain);
         require(msg.value >= newDomainPrice);
@@ -92,6 +92,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         addressToReceipts[msg.sender].push(newReceipt);
     }
    
+   // tested
     function edit(bytes32 domain, bytes4 newIp) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -101,6 +102,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
    
+    // tested
     function transferDomain(bytes32 domain, address newOwner) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -110,6 +112,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogDomainTransferred(domain, oldOwner, newOwner);
     }
    
+    // tested
     function getIP(bytes32 domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
