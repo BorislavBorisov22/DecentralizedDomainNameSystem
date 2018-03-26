@@ -1,10 +1,10 @@
 pragma solidity ^0.4.17;
 
-import "./common/Killable.sol";
+import "./DomainNameSystemBanking.sol";
 import "./libraries/SafeMath.sol";
 import "./abstracts/DomainNameSystemBase.sol";
 
-contract DomainNameSystem is Killable, DomainNameSystemBase {
+contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
     using SafeMath for uint256;
    
     struct DomainInfo {
@@ -25,11 +25,11 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
 
     bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
 
-    uint public constant MIN_DOMAIN_PRICE = 1 ether;
+    uint public constant MIN_DOMAIN_PRICE = 800 finney;
     uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
     uint public constant MIN_DOMAIN_NAME_LENGTH = 5;
 
-    uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
+    uint private DOMAIN_REGISTRATION_PRICE = 1 ether;
 
     mapping(bytes32 => DomainInfo) domainNameToDomainInfo;
     mapping(bytes32 => address) domainNameToOwner;
@@ -117,6 +117,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         return domainNameToDomainInfo[domain].ip;
     }
    
+    // for testing
     function getPrice(bytes32 domain) public view returns (uint) {
         return getNewDomainPrice(domain);
     }
@@ -141,7 +142,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         while (
             domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
             pricesIndex < 5 &&
-            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= 0) {
+            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= MIN_DOMAIN_PRICE) {
 
             decreasePriceAmount = priceChanges[uint(pricesIndex)];
             pricesIndex++;

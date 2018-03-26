@@ -3,6 +3,7 @@
         "../contracts/common/Owned.sol",
         "../contracts/common/Killable.sol",
         "../contracts/libraries/SafeMath.sol",
+        "../contracts/DomainNameSystemBanking.sol",
         "../contracts/abstracts/DomainNameSystemBase.sol",
         "../contracts/DomainNameSystem.sol"
     ],

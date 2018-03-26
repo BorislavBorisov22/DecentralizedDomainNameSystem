@@ -29,7 +29,7 @@ contract Killable is Owned {
         selfdestruct(owner);
     }
 
-    function withDrawAndKill(address receiver) public OwnerOnly {
+    function withdrawAndKill(address receiver) public OwnerOnly {
         require(receiver != address(0x0));
         receiver.transfer(this.balance);
         kill();
@@ -63,6 +63,19 @@ library SafeMath {
 	}
 }
 
+
+
+contract DomainNameSystemBanking is Killable{
+
+    function sendFundsToAddress(address receiver) public OwnerOnly {
+        receiver.transfer(address(this).balance);
+    }
+
+    function withdraw() public OwnerOnly {
+        owner.transfer(address(this).balance);
+    }
+}
+
 contract DomainNameSystemBase {
     struct Receipt{
         uint amountPaidWei;
@@ -85,7 +98,11 @@ contract DomainNameSystemBase {
     function getReceipts(address account) public view returns (Receipt[]);
 }
 
-contract DomainNameSystem is Killable, DomainNameSystemBase {
+
+
+
+
+contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
     using SafeMath for uint256;
    
     struct DomainInfo {
@@ -102,15 +119,16 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
     ];
 
     uint DECREASE_PRICE_START_INDEX = 15;
-    uint INCREASE_PRICE_START_INDEX = 10;
+    uint INCREASE_PRICE_START_INDEX = 10 ;
 
     bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
 
-    uint public constant MIN_DOMAIN_PRICE = 1 ether;
+    uint public constant MIN_DOMAIN_PRICE = 1 ether / 5;
+    uint public constant MAX_DOMAIN_PRICE = 5 ether;
     uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
     uint public constant MIN_DOMAIN_NAME_LENGTH = 5;
 
-    uint public DOMAIN_REGISTRATION_PRICE = 1 ether;
+    uint private DOMAIN_REGISTRATION_PRICE = 1 ether;
 
     mapping(bytes32 => DomainInfo) domainNameToDomainInfo;
     mapping(bytes32 => address) domainNameToOwner;
@@ -131,19 +149,22 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         require(domainName[MIN_DOMAIN_NAME_LENGTH - 1] != BYTES_DEFAULT_VALUE);
         _;
     }
- 
+
+    // tested
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
-   
+    
+    // tested
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
- 
+    
+    // tested
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         uint newDomainPrice = getNewDomainPrice(domain);
         require(msg.value >= newDomainPrice);
-       
+
         domainNameToDomainInfo[domain].ip = ip;
         if (isDomainOwner(msg.sender, domain)) {
             uint newExpiryPeriod = domainAvailableForRegistration(domain) ?
@@ -170,6 +191,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         addressToReceipts[msg.sender].push(newReceipt);
     }
    
+   // tested
     function edit(bytes32 domain, bytes4 newIp) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -179,6 +201,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
    
+    // tested
     function transferDomain(bytes32 domain, address newOwner) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -188,10 +211,12 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         LogDomainTransferred(domain, oldOwner, newOwner);
     }
    
+    // tested
     function getIP(bytes32 domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
    
+    // for testing
     function getPrice(bytes32 domain) public view returns (uint) {
         return getNewDomainPrice(domain);
     }
@@ -216,7 +241,7 @@ contract DomainNameSystem is Killable, DomainNameSystemBase {
         while (
             domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
             pricesIndex < 5 &&
-            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= 0) {
+            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= MIN_DOMAIN_PRICE) {
 
             decreasePriceAmount = priceChanges[uint(pricesIndex)];
             pricesIndex++;

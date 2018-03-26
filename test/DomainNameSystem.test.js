@@ -212,4 +212,80 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         const [domainOwner] = await sut.getDomainInfo(domainName);
         assert.equal(domainOwner, accountHelper);
     });
+
+    it('expect getPrice to return correct price increase for registering shorter domain names', async() => {
+        const expectedDomainIncreases = {
+            somed: web3.toWei(1.1, 'ether'),
+            somedo: web3.toWei(1.1, 'ether'),
+            somedom: web3.toWei(1.05, 'ether'),
+            somedoma: web3.toWei(1.02, 'ether'),
+            somedomai: web3.toWei(1.01, 'ether'),
+            somedomain: web3.toWei(1.005, 'ether'),
+            notsoshortdou: web3.toWei(1, 'ether')
+        };
+
+        const domainPricesPromises = Object.keys(expectedDomainIncreases).map(key => {
+            return sut.getPrice(key);
+        });
+
+        const prices = await Promise.all(domainPricesPromises);
+        Object.keys(expectedDomainIncreases).forEach((key, index) => {
+            assert.equal(expectedDomainIncreases[key], prices[index]);
+        });
+    });
+
+    it('expect getPrice to return correct price decrease for registering longer domain names', async() => {
+        const expectedDomainIncreases = {
+            somedomainnamenn: web3.toWei(0.995, 'ether'),
+            somedomainnameean: web3.toWei(0.99, 'ether'),
+            somedomainnameeaen: web3.toWei(0.98, 'ether'),
+            somedomainnamenamen: web3.toWei(0.95, 'ether'),
+            somedomainnamenamenn: web3.toWei(0.9, 'ether'),
+            someveryverylongdomainName: web3.toWei(0.9, 'ether')
+        };
+
+        const domainPricesPromises = Object.keys(expectedDomainIncreases).map(key => {
+            return sut.getPrice(key);
+        });
+
+        const prices = await Promise.all(domainPricesPromises);
+        Object.keys(expectedDomainIncreases).forEach((key, index) => {
+            assert.equal(expectedDomainIncreases[key], prices[index]);
+        });
+    });
+
+    it('expect not to drop the price under the MIN_PRICE for domain no matter how many long domains are registered', async() => {
+        const longDomainName = 'somelongDomainNameLongLong';
+        const ip = 'some';
+
+        await sut.register(longDomainName, ip, {from: owner, value: web3.toWei(1, 'ether')});
+        await sut.register(longDomainName, ip, {from: owner, value: web3.toWei(1, 'ether')});
+        await sut.register(longDomainName, ip, {from: owner, value: web3.toWei(1, 'ether')});
+        await sut.register(longDomainName, ip, {from: owner, value: web3.toWei(1, 'ether')});
+
+        const longDomainPrice = await sut.getPrice(longDomainName);
+
+        const expectedMinPrice = web3.toWei(0.8, 'ether');
+
+        assert.equal(longDomainPrice, expectedMinPrice);
+    });
+
+    it('expect domainInfo to return the correct owner, expires, and ip values', async() => {
+        const domainName = 'dddname';
+        const domainIp = 'some';
+        const price = web3.toWei(1.2, 'ether');
+
+        const initialTransaction = await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
+
+        const [domainOwner, expires, ip] = await sut.getDomainInfo(domainName);
+
+        const expiryPeriod = await sut.DOMAIN_REGISTRATION_EXPIRY_PERIOD();
+
+        const now = web3.eth.getBlock(initialTransaction.receipt.blockNumber).timestamp;
+        const expectedExpiryPeriod = expiryPeriod.add(now);
+
+        assert(domainOwner === owner);
+        assert.deepEqual(expires, expectedExpiryPeriod);
+        assert(web3.toUtf8(ip) === domainIp);
+    });
 });
