@@ -179,6 +179,20 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
     });
 
     it('expect getIp to return empty string when called on non-registered domain name', async() => {
+        const domainName = 'somedomain';
 
+        const ip = web3.toUtf8(await sut.getIP(domainName));
+        assert.equal(ip, '');
+    });
+
+    it('expect getIp to return correct ip when passed a registered domainName', async() => {
+        const domainName = 'domainname';
+        const domainIp = 'ipip';
+        const price = web3.toWei(1.2, 'ether');
+
+        await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price });
+
+        const ip = web3.toUtf8(await sut.getIP(domainName));
+        assert.equal(ip, domainIp);
     });
 });
