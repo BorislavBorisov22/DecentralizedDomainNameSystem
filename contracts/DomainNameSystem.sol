@@ -122,16 +122,19 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         return getNewDomainPrice(domain);
     }
    
+    // for testing
     function getReceipts(address account) public view returns (Receipt[]) {
         return addressToReceipts[account];
     }
-   
+    
+    // tested
     function getDomainInfo(bytes32 domain) public view returns (address owner, uint expires, bytes4 ip) {
         owner = domainNameToOwner[domain];
         expires = domainNameToDomainInfo[domain].expires;
         ip = domainNameToDomainInfo[domain].ip;
     }
-   
+
+    // tested
     function getNewDomainPrice(bytes32 domainName) validDomainName(domainName) internal view returns(uint) {
         uint increasePriceAmount = 0;
         uint decreasePriceAmount = 0;
