@@ -136,7 +136,7 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
 
     it('expect to update domainInfo and expiry period correctly when expired domain is registered from a new owner', async() => {
         const domainName = 'dddname';
-        const domainIp = 'some';
+        const domainIp = 'asdf';
         const price = web3.toWei(1.2, 'ether');
 
         await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
@@ -151,5 +151,34 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         const expectedExpiryPeriod = expiryPeriod.add(now);
 
         assert.deepEqual(expires, expectedExpiryPeriod);
+        assert.equal(domainOwner, accountHelper);
+        assert.equal(web3.toUtf8(ip), domainIp);
+    });
+
+    it('expect edit domain to throw when editing domain that is not owned by called', async() => {
+        const domainName = 'someDomain';
+        const domainIp = 'somedomainIP';
+
+        const editPromise = sut.edit(domainName, domainIp);
+        assertRevert(editPromise);
+    });
+
+    it('expect edit domain to edit domain ip correctly when domain edited by owner', async() => {
+        const domainName = 'somedomain';
+        const domainIp = 'someip';
+        const price = web3.toWei(1.2, 'ether');
+
+        const newIp = 'newi';
+
+        await sut.register(domainName, web3.fromUtf8(domainIp), {from: owner, value: price});
+        await sut.edit(domainName, web3.fromUtf8(newIp), {from: owner});
+
+        const [,, ip] = await sut.getDomainInfo(domainName);
+
+        assert.equal(web3.toUtf8(ip), newIp);
+    });
+
+    it('expect getIp to return empty string when called on non-registered domain name', async() => {
+
     });
 });
