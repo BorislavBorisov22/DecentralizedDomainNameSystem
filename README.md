@@ -14,6 +14,6 @@ interaction with the contract (using web3 and Metamask).
   - Searching Domain
     ![image](./application-images/search-domain.png)
   - Transfer Domain
-    ![image](./application-images/transfer.png)
+    ![image](./application-images/transfer-domain.png)
   - Shopping Cart
-    ![image](./application-images/cart.png) 
+    ![image](./application-images/shopping-cart.png) 
