@@ -1,6 +1,7 @@
 const config = {
-  // old -> 0x259d80fca05d945614f49da3d56f98ed664d8192
-    contractAddress: '0x517b66adafe85a73cb109a37aed089753eb5bb1b',
+  // old old -> 0x259d80fca05d945614f49da3d56f98ed664d8192
+  // old -> 0x517b66adafe85a73cb109a37aed089753eb5bb1b
+    contractAddress: '0xc1b1af822abc238b1d98d1ac4c3e96e90dceb835',
     contractAbi:[
         {
           "constant": true,

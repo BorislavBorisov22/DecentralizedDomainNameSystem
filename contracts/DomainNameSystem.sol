@@ -141,15 +141,15 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         while (
             domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
             pricesIndex < 5 &&
-            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= MIN_DOMAIN_PRICE) {
+            DOMAIN_REGISTRATION_PRICE.sub(priceChanges[pricesIndex]) >= MIN_DOMAIN_PRICE) {
 
             decreasePriceAmount = priceChanges[uint(pricesIndex)];
-            pricesIndex++;
-            domainNameIndex++;
+            pricesIndex = pricesIndex.add(1);
+            domainNameIndex = domainNameIndex.add(1);
         }
         
         if (decreasePriceAmount > 0) {
-            return DOMAIN_REGISTRATION_PRICE - decreasePriceAmount;
+            return DOMAIN_REGISTRATION_PRICE.sub(decreasePriceAmount);
         }
 
         pricesIndex = 0;
@@ -159,11 +159,11 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
             && pricesIndex < 5) {
 
             increasePriceAmount = priceChanges[uint(pricesIndex)];
-            pricesIndex++;
-            domainNameIndex--;
+            pricesIndex = pricesIndex.add(1);
+            domainNameIndex = domainNameIndex.sub(1);
         }
 
-        return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
+        return DOMAIN_REGISTRATION_PRICE.add(increasePriceAmount);
     }
 
     function contractAddress() public view returns(address) {

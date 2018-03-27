@@ -123,8 +123,7 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
 
     bytes1 BYTES_DEFAULT_VALUE = bytes1(0x0);
 
-    uint public constant MIN_DOMAIN_PRICE = 1 ether / 5;
-    uint public constant MAX_DOMAIN_PRICE = 5 ether;
+    uint public constant MIN_DOMAIN_PRICE = 800 finney;
     uint public constant DOMAIN_REGISTRATION_EXPIRY_PERIOD = 1 years;
     uint public constant MIN_DOMAIN_NAME_LENGTH = 5;
 
@@ -150,17 +149,14 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         _;
     }
 
-    // tested
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
     
-    // tested
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
     
-    // tested
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         uint newDomainPrice = getNewDomainPrice(domain);
         require(msg.value >= newDomainPrice);
@@ -191,7 +187,6 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         addressToReceipts[msg.sender].push(newReceipt);
     }
    
-   // tested
     function edit(bytes32 domain, bytes4 newIp) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -201,7 +196,6 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
    
-    // tested
     function transferDomain(bytes32 domain, address newOwner) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -211,12 +205,10 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         LogDomainTransferred(domain, oldOwner, newOwner);
     }
    
-    // tested
     function getIP(bytes32 domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
    
-    // for testing
     function getPrice(bytes32 domain) public view returns (uint) {
         return getNewDomainPrice(domain);
     }
@@ -224,13 +216,19 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
     function getReceipts(address account) public view returns (Receipt[]) {
         return addressToReceipts[account];
     }
-   
+
+    function getReceipt(address account, uint index) public view returns (uint amountPaidWei, uint timestamp, uint expires) {
+        amountPaidWei = addressToReceipts[account][index].amountPaidWei;
+        timestamp = addressToReceipts[account][index].timestamp;
+        expires = addressToReceipts[account][index].expires;
+    }
+    
     function getDomainInfo(bytes32 domain) public view returns (address owner, uint expires, bytes4 ip) {
         owner = domainNameToOwner[domain];
         expires = domainNameToDomainInfo[domain].expires;
         ip = domainNameToDomainInfo[domain].ip;
     }
-   
+
     function getNewDomainPrice(bytes32 domainName) validDomainName(domainName) internal view returns(uint) {
         uint increasePriceAmount = 0;
         uint decreasePriceAmount = 0;
@@ -241,15 +239,15 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         while (
             domainName[domainNameIndex] != BYTES_DEFAULT_VALUE &&
             pricesIndex < 5 &&
-            DOMAIN_REGISTRATION_PRICE - priceChanges[pricesIndex] >= MIN_DOMAIN_PRICE) {
+            DOMAIN_REGISTRATION_PRICE.sub(priceChanges[pricesIndex]) >= MIN_DOMAIN_PRICE) {
 
             decreasePriceAmount = priceChanges[uint(pricesIndex)];
-            pricesIndex++;
-            domainNameIndex++;
+            pricesIndex = pricesIndex.add(1);
+            domainNameIndex = domainNameIndex.add(1);
         }
         
         if (decreasePriceAmount > 0) {
-            return DOMAIN_REGISTRATION_PRICE - decreasePriceAmount;
+            return DOMAIN_REGISTRATION_PRICE.sub(decreasePriceAmount);
         }
 
         pricesIndex = 0;
@@ -259,11 +257,11 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
             && pricesIndex < 5) {
 
             increasePriceAmount = priceChanges[uint(pricesIndex)];
-            pricesIndex++;
-            domainNameIndex--;
+            pricesIndex = pricesIndex.add(1);
+            domainNameIndex = domainNameIndex.sub(1);
         }
 
-        return DOMAIN_REGISTRATION_PRICE + increasePriceAmount;
+        return DOMAIN_REGISTRATION_PRICE.add(increasePriceAmount);
     }
 
     function contractAddress() public view returns(address) {
