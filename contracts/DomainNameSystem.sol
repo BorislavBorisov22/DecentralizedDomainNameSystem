@@ -51,17 +51,14 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         _;
     }
 
-    // tested
     function isDomainOwner(address adr, bytes32 domainName) public view returns(bool) {
         return domainNameToOwner[domainName] == adr && !domainAvailableForRegistration(domainName);
     }
     
-    // tested
     function domainAvailableForRegistration(bytes32 domainName) public view returns(bool) {
         return domainNameToDomainInfo[domainName].expires < now;
     }
     
-    // tested
     function register(bytes32 domain, bytes4 ip) public payable canRegisterDomain(domain) validDomainName(domain) {
         uint newDomainPrice = getNewDomainPrice(domain);
         require(msg.value >= newDomainPrice);
@@ -92,7 +89,6 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         addressToReceipts[msg.sender].push(newReceipt);
     }
    
-   // tested
     function edit(bytes32 domain, bytes4 newIp) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -102,7 +98,6 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         LogIpEdited(msg.sender, domain, oldIp, newIp);
     }
    
-    // tested
     function transferDomain(bytes32 domain, address newOwner) public {
         require(isDomainOwner(msg.sender, domain));
        
@@ -112,29 +107,30 @@ contract DomainNameSystem is DomainNameSystemBanking, DomainNameSystemBase {
         LogDomainTransferred(domain, oldOwner, newOwner);
     }
    
-    // tested
     function getIP(bytes32 domain) public view returns (bytes4) {
         return domainNameToDomainInfo[domain].ip;
     }
    
-    // for testing
     function getPrice(bytes32 domain) public view returns (uint) {
         return getNewDomainPrice(domain);
     }
    
-    // for testing
     function getReceipts(address account) public view returns (Receipt[]) {
         return addressToReceipts[account];
     }
+
+    function getReceipt(address account, uint index) public view returns (uint amountPaidWei, uint timestamp, uint expires) {
+        amountPaidWei = addressToReceipts[account][index].amountPaidWei;
+        timestamp = addressToReceipts[account][index].timestamp;
+        expires = addressToReceipts[account][index].expires;
+    }
     
-    // tested
     function getDomainInfo(bytes32 domain) public view returns (address owner, uint expires, bytes4 ip) {
         owner = domainNameToOwner[domain];
         expires = domainNameToDomainInfo[domain].expires;
         ip = domainNameToDomainInfo[domain].ip;
     }
 
-    // tested
     function getNewDomainPrice(bytes32 domainName) validDomainName(domainName) internal view returns(uint) {
         uint increasePriceAmount = 0;
         uint decreasePriceAmount = 0;

@@ -276,7 +276,6 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         const price = web3.toWei(1.2, 'ether');
 
         const initialTransaction = await sut.register(domainName, web3.fromUtf8(domainIp), { from: owner, value: price});
-
         const [domainOwner, expires, ip] = await sut.getDomainInfo(domainName);
 
         const expiryPeriod = await sut.DOMAIN_REGISTRATION_EXPIRY_PERIOD();
@@ -287,5 +286,23 @@ contract('DomainNameSystem', ([owner, accountHelper, secondAccountHelper]) => {
         assert(domainOwner === owner);
         assert.deepEqual(expires, expectedExpiryPeriod);
         assert(web3.toUtf8(ip) === domainIp);
+    });
+
+    it('expect getReceipt to return the correct receipt info for the specified address and index', async() => {
+        const domainName = 'somee';
+        const domainIp = 'ipip';
+        const price = web3.toWei(1.1);
+
+        const initialTransaction = await sut.register(domainName, domainIp, {from: owner, value: price});
+
+        const expiryPeriod = await sut.DOMAIN_REGISTRATION_EXPIRY_PERIOD();
+        const now = web3.eth.getBlock(initialTransaction.receipt.blockNumber).timestamp;
+        const expectedExpiryPeriod = expiryPeriod.add(now);
+        
+        const [amountPaidWei, timestamp, expires] = await sut.getReceipt(owner, 0);
+
+        assert.equal(expires.toString(), expectedExpiryPeriod.toString());
+        assert.equal(amountPaidWei, price);
+        assert.equal(now, timestamp);
     });
 });
