@@ -13,7 +13,7 @@ const Header = ({ activeAddress, cartItemsCount }) => {
                 <span className="icon-bar"></span>
                 <span className="icon-bar"></span>
                 </button>
-                <a className="navbar-brand" href="#">DDNS</a>
+                <Link className="navbar-brand" to="/">DomainNameSystem</Link>
             </div>
             <div id="navbar" className="navbar-collapse collapse" aria-expanded="false" style={{height: '1px'}}>
                 <ul className="nav navbar-nav">
@@ -22,8 +22,8 @@ const Header = ({ activeAddress, cartItemsCount }) => {
                 </ul>
                 <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">your account: <span className="text-primary">{activeAddress}</span></a></li>
-                <li style={{color: cartItemsCount > 0 ? 'red': ''}}><Link to="/cart"><img style={{height: '15px', width: '30px'}} src="https://cdn2.iconfinder.com/data/icons/travel-solid-icons-vol-1/48/019-512.png"/>
-                    {cartItemsCount > 0 && <span style={{color: 'white', 'background-color': 'red', padding: '5px', 'margin-left': '5px', borderRadius: '50%'}}>{cartItemsCount}</span>}
+                <li style={{color: cartItemsCount > 0 ? 'red': ''}}><Link to="/cart"><img style={{height: '22px', width: '30px'}} src="https://image.flaticon.com/icons/svg/60/60992.svg"/>
+                    {cartItemsCount > 0 && <span style={{color: 'white', 'background-color': 'red', padding: '5px', borderRadius: '50%'}}>{cartItemsCount}</span>}
                     </Link>
                 </li>
                 </ul>

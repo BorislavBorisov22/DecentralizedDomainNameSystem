@@ -1,8 +1,16 @@
 import React, { PropTypes } from 'react';
 import Header from './common/Header';
 import { connect } from 'react-redux';
+import toastr from 'toastr';
 
 class App extends React.Component {
+
+    componentWillMount() {
+        toastr.options = {
+            positionClass: "toast-bottom-full-width"
+        };
+    }
+
     render() {
         return (
             <div className="container">

@@ -5,7 +5,7 @@ import TextInput from './../common/TextInput';
 const SearchDomainForm = ({ domain, onSearch, onChange, errors}) => {
     return (
         <div>
-            <h1>Search For a Domain</h1>
+            <h1>Search For Domain</h1>
 
             <br />
 
