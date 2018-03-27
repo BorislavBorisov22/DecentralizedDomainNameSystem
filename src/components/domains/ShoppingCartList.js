@@ -32,14 +32,11 @@ const ShoppingCartList = ({domains, onCheckout, removeDomain, addDomainIp, buyDo
                         <td>   </td>
                         <td>   </td>
                         <td>   </td>
-                        <td>
-                        <Link to="/search-domains" className="btn btn-default">
+                        <td></td>
+                        <td><Link to="/search-domains" className="btn btn-default">
                             Continue Shopping
-                        </Link></td>
-                        <td>
-                        <button disabled={domains.length === 0} onClik={onCheckout} type="button" className="btn btn-success">
-                            Checkout
-                        </button></td>
+                        </Link>
+                        </td>
                     </tr>
                 </tbody>
             </table>

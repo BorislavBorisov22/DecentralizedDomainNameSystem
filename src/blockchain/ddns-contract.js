@@ -55,7 +55,7 @@ function getContract () {
         },
         getDomain(domainName) {
             return Promise.all([this.domainPrice(domainName), this.domainInfo(domainName)])
-                .then(([price, info]) => {                    
+                .then(([price, info]) => {
                     return Object.assign({}, {price, domainName}, info);
                 });
         },

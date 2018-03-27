@@ -15,6 +15,10 @@ class ShoppingCartPage extends React.Component {
         this.buyDomain = this.buyDomain.bind(this);
     }
 
+    componentWillMount(){
+        toastr.info('Plese note that the displayed prices might have changed over time and could not be completely accurate.')
+    }
+
     removeDomain(domain) {
         this.props.actions.removeDomainFromCart(domain);
     }

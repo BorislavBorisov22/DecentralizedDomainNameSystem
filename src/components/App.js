@@ -7,7 +7,9 @@ class App extends React.Component {
         return (
             <div className="container">
                 <Header activeAddress={this.props.activeAddress} cartItemsCount={this.props.cartItemsCount} />
-                {this.props.children}
+                <div className="app-container">
+                    {this.props.children}
+                </div>
             </div>
         );
     }
