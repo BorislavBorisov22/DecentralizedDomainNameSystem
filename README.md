@@ -12,7 +12,7 @@ interaction with the contract (using web3 and Metamask).
   - Home Page
     ![image](./application-images/home.png)
   - Searching Domain
-    ![image](./application-images/search-domain.png)
+    ![image](./application-images/domain-search.png)
   - Transfer Domain
     ![image](./application-images/transfer-domain.png)
   - Shopping Cart
